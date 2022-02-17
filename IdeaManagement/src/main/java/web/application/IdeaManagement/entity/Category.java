@@ -8,7 +8,7 @@ import java.util.Date;
 @Entity
 @Data
 @Table(name = "categories")
-public class Category {
+public class Category extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,14 +19,5 @@ public class Category {
 
     @Column(name = "category",length = 50, nullable = false)
     private String category;
-
-    @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted;
-
-    @Column(name = "created_date", nullable = false)
-    private Date createDate;
-
-    @Column(name = "updated_date")
-    private Date updatedDate;
 
 }

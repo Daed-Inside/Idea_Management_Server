@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class UserDetailManager implements UserDetails {
     private static final long serialVersionUID = 1L;
 
-    private Long id;
+    private String id;
 
     private String username;
 
@@ -49,7 +49,7 @@ public class UserDetailManager implements UserDetails {
 
     }
 
-    public UserDetailManager(Long id, String username, String email, String password,
+    public UserDetailManager(String id, String username, String email, String password,
                              String responseMessage, String jwt,
                              Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
@@ -67,7 +67,7 @@ public class UserDetailManager implements UserDetails {
                 .collect(Collectors.toList());
 
         return new UserDetailManager(
-                user.getId(),
+                user.getUserId(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),
@@ -81,7 +81,7 @@ public class UserDetailManager implements UserDetails {
         return authorities;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 

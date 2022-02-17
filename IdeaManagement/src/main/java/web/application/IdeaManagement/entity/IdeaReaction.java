@@ -8,7 +8,7 @@ import java.util.Date;
 @Entity
 @Data
 @Table(name = "idea_reaction")
-public class IdeaReaction {
+public class IdeaReaction extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,9 +23,4 @@ public class IdeaReaction {
     @Column(name = "evaluation", nullable = false)
     private Boolean evaluation;
 
-    @Column(name = "create_date", nullable = false)
-    private Date createDate;
-
-    @Column(name = "updated_date")
-    private Date updatedDate;
 }

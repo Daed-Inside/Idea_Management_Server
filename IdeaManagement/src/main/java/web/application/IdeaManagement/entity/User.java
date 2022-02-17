@@ -14,22 +14,22 @@ public class User{
 
     @Id
 	@Column(name = "user_id", length = 50, nullable = false)
-	private Long userId;
+	private String userId;
 
 	@Column(name = "department_id", nullable = false)
 	private Long departmentId;
 
-    @Column(name = "user_name", length = 50, nullable = false)
+    @Column(name = "username", length = 50, nullable = false)
 	private String username;
 
 	@Column(name = "email", length = 50, nullable = false)
 	private String email;
 
-	@Column(name = "first_name", length = 50, nullable = false)
-	private String firstName;
+	@Column(name = "firstname", length = 50, nullable = false)
+	private String firstname;
 
-	@Column(name = "last_name", length = 50, nullable = false)
-	private String lastName;
+	@Column(name = "lastname", length = 50, nullable = false)
+	private String lastname;
 
 	@Column(name = "age")
 	private Long age;

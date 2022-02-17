@@ -8,7 +8,7 @@ import java.util.Date;
 @Entity
 @Data
 @Table(name = "idea_view_count")
-public class IdeaViewCount {
+public class IdeaViewCount extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

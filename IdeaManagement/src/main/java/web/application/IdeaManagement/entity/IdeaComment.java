@@ -8,7 +8,7 @@ import java.util.Date;
 @Entity
 @Data
 @Table(name = "idea_Comment")
-public class IdeaComment {
+public class IdeaComment extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -9,33 +9,35 @@ import java.util.Date;
 
 @Data
 @Transactional(readOnly=false)
-@Table(name = "base_entity")
 public class BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "create_user", nullable = false)
-    private String createUser;
+    @Column(name = "created_user", nullable = false)
+    private String createdUser;
 
-    @Column(name = "create_time", nullable = false)
-    private Date createTime;
+    @Column(name = "created_date", nullable = false)
+    private Date createdDate;
 
     @Column(name = "modified_user", nullable = false)
     private String modifiedUser;
 
-    @Column(name = "modified_time", nullable = false)
-    private Date modifiedTime;
+    @Column(name = "modified_date", nullable = false)
+    private Date modifiedDate;
 
     @Column(name = "is_deleted")
     private boolean isDeleted = Boolean.FALSE;
 
+    public BaseEntity() {
+    }
+
     public BaseEntity(Long id, String createUser, Date createTime, String modifiedUser, Date modifiedTime, boolean isDeleted) {
         this.id = id;
-        this.createUser = createUser;
-        this.createTime = createTime;
+        this.createdUser = createUser;
+        this.createdDate = createTime;
         this.modifiedUser = modifiedUser;
-        this.modifiedTime = modifiedTime;
+        this.modifiedDate = modifiedTime;
         this.isDeleted = isDeleted;
     }
 }

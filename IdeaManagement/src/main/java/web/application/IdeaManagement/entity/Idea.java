@@ -8,7 +8,7 @@ import java.util.Date;
 @Entity
 @Data
 @Table(name = "ideas")
-public class Idea {
+public class Idea extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,11 +31,5 @@ public class Idea {
 
     @Column(name = "is_anonymous", nullable = false)
     private Boolean isAnonymous ;
-
-    @Column(name = "create_date", nullable = false)
-    private Date createDate;
-
-    @Column(name = "updated_date")
-    private Date updatedDate;
 
 }

@@ -39,13 +39,4 @@ public class Topic {
     @Column(name = "final_end_date", nullable = false)
     private Date finalEndDate;
 
-    @Column(name = "created_date", nullable = false)
-    private Date createdDate;
-
-    @Column(name = "updated_date")
-    private Date updatedDate;
-
-    @Column(name = "updated_user", length = 50)
-    private String updatedUser;
-
 }

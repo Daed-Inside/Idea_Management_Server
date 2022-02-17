@@ -8,7 +8,7 @@ import java.util.Date;
 @Entity
 @Data
 @Table(name = "idea_attachment")
-public class IdeaAttachment {
+public class IdeaAttachment extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,9 +29,4 @@ public class IdeaAttachment {
     @Column(name = "download_url", length = 250, nullable = false)
     private String downloadUrl;
 
-    @Column(name = "create_date", nullable = false)
-    private Date createDate;
-
-    @Column(name = "updated_date")
-    private Date updatedDate;
 }
