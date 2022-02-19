@@ -8,11 +8,7 @@ import java.util.Date;
 @Entity
 @Data
 @Table(name = "topics")
-public class Topic {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Topic extends BaseEntity{
 
     @Column(name = "user_id", length = 50, nullable = false)
     private String userId;

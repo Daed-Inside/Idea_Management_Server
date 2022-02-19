@@ -11,6 +11,8 @@ import web.application.IdeaManagement.manager.UserDetailManager;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class JwtUtils {
@@ -25,7 +27,9 @@ public class JwtUtils {
 	public String generateJwtToken(Authentication authentication) {
 		UserDetailManager userPrincipal = (UserDetailManager) authentication.getPrincipal();
 		System.out.println(jwtSecret);
-		return Jwts.builder().setSubject((userPrincipal.getUsername())).setIssuedAt(new Date())
+		Map<String, Object> mapClaim = new HashMap<>();
+		mapClaim.put("userId", userPrincipal.getId());
+		return Jwts.builder().setSubject((userPrincipal.getUsername())).setClaims(mapClaim).setIssuedAt(new Date())
 				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
 				.signWith(SignatureAlgorithm.HS256, jwtSecret).compact();
 	}
@@ -41,6 +45,11 @@ public class JwtUtils {
 	public static String getUserNameFromJwtToken(String token) {
 		return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
 	}
+
+	public static String getUserIdFromJwtToken(String token) {
+		return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().get("userId").toString();
+	}
+
 	public static String getUserNameJwtToken(String token) {
 		String username;
 		try {

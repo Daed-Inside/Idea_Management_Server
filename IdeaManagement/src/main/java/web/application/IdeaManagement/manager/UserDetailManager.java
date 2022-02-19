@@ -37,7 +37,7 @@ public class UserDetailManager implements UserDetails {
     }
 
     public void setResponseMessage(String responseMessage) {
-        responseMessage = responseMessage;
+        this.responseMessage = responseMessage;
     }
 
     @JsonIgnore

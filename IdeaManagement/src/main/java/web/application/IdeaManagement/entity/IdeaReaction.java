@@ -10,10 +10,6 @@ import java.util.Date;
 @Table(name = "idea_reaction")
 public class IdeaReaction extends BaseEntity{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(name = "user_id", length = 50, nullable = false)
     private String userId;
 

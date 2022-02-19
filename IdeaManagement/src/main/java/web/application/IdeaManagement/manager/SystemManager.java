@@ -22,27 +22,31 @@ public class SystemManager {
 
     public UserDetailManager login(LoginRequest request) {
         try {
+            String username = request.getEmail().substring(0, request.getEmail().indexOf("@"));
             UserDetailManager userDetails = new UserDetailManager();
-            User existUser = userRepository.findByEmail(request.getEmail());
-            if (existUser == null) {
+            Boolean existUser = userRepository.existsByEmail(request.getEmail());
+            if (!existUser) {
                 userDetails.setResponseMessage("user_not_exist");
                 return userDetails;
             } else {
                 try {
                     Authentication authentication = authenticationManager.authenticate(
-                            new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+                            new UsernamePasswordAuthenticationToken(username, request.getPassword()));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                     String jwt = jwtUtils.generateJwtToken(authentication);
                     userDetails = (UserDetailManager) authentication.getPrincipal();
                     userDetails.setJwt(jwt);
+                    userDetails.setResponseMessage("success");
                     return userDetails;
                 } catch (Exception e) {
+                    e.printStackTrace();
                     userDetails.setResponseMessage("wrong_password");
                     return userDetails;
                 }
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }

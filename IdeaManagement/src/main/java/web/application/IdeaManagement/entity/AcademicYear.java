@@ -10,10 +10,6 @@ import java.util.Date;
 @Table(name = "academic_year")
 public class AcademicYear extends BaseEntity{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(name = "year", length = 10, nullable = false)
     private String year;
 

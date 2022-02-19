@@ -1,12 +1,14 @@
 package web.application.IdeaManagement.controller;
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.util.*;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import web.application.IdeaManagement.entity.Role;
@@ -21,9 +23,6 @@ import web.application.IdeaManagement.repository.UserRepository;
 import web.application.IdeaManagement.utils.JwtUtils;
 import web.application.IdeaManagement.utils.ResponseUtils;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -88,7 +87,9 @@ public class AuthenController {
             }
 
             // Create new user's account
-            User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(),
+            String userId = UUID.randomUUID().toString();
+            String username = signUpRequest.getEmail().substring(0, signUpRequest.getEmail().indexOf("@"));
+            User user = new User(username, signUpRequest.getEmail(),
                     encoder.encode(signUpRequest.getPassword()));
 
             Set<Long> strRoles = signUpRequest.getRole();
@@ -100,10 +101,23 @@ public class AuthenController {
                 roles.add(userRole);
             } else {
             }
+            String generatedString = RandomStringUtils.random(10, true, true);
+            user.setUsername(username);
+            user.setAddress(signUpRequest.getAddress());
+            user.setPhone(signUpRequest.getPhone());
+            user.setDepartmentId(signUpRequest.getDepartmentId());
+            user.setFirstname(signUpRequest.getFirstname());
+            user.setLastname(signUpRequest.getLastname());
             user.setRoles(roles);
+            user.setUserId(userId);
+            user.setCreateDate(new Date());
+            user.setCreatedUser("khiem");
+            user.setOtpCode(generatedString);
+            user.setOtpExpired(DateUtils.addMinutes(new Date(), 10));
             userDao.save(user);
             return responseUtils.getResponseEntity(null, 1, "Success", HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
             return responseUtils.getResponseEntity(null, -1, "Fail", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

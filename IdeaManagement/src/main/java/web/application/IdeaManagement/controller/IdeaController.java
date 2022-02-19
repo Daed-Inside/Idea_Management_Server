@@ -8,8 +8,10 @@ import web.application.IdeaManagement.dto.PageDto;
 import web.application.IdeaManagement.manager.IdeaManager;
 import web.application.IdeaManagement.model.request.IdeaRequestModel;
 import web.application.IdeaManagement.model.response.IdeaResponseModel;
+import web.application.IdeaManagement.utils.JwtUtils;
 import web.application.IdeaManagement.utils.ResponseUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @CrossOrigin("*")
@@ -20,10 +22,13 @@ public class IdeaController {
     IdeaManager ideaManager;
     @Autowired
     ResponseUtils responseUtils;
+    @Autowired
+    JwtUtils jwtUtils;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createIdea(@RequestBody IdeaRequestModel req) {
+    public ResponseEntity<?> createIdea(@RequestBody IdeaRequestModel req, HttpServletRequest request) {
         try {
+            String jwt = jwtUtils.getJwtFromRequest(request);
             Boolean result = ideaManager.createIdea(req);
             if (result) {
                 return responseUtils.getResponseEntity(null, 1, "Create Successfully", HttpStatus.OK);

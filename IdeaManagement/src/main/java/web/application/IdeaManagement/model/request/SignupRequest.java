@@ -9,6 +9,8 @@ public class SignupRequest {
     private Long id;
     private Long departmentId;
     private String username;
+    private String firstname;
+    private String lastname;
     private String email;
     private String sex;
     private String avatar;

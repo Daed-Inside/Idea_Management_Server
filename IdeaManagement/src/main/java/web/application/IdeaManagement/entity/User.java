@@ -58,7 +58,7 @@ public class User{
 	@Column(name = "created_user", length = 50, nullable = false)
 	private String createdUser;
 
-	@Column(name = "updated_user", length = 50, nullable = false)
+	@Column(name = "updated_user", length = 50)
 	private String updatedUser;
 
 

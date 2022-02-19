@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Data
-@Transactional(readOnly=false)
+@MappedSuperclass
 public class BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +27,7 @@ public class BaseEntity implements Serializable {
     private Date modifiedDate;
 
     @Column(name = "is_deleted")
-    private boolean isDeleted = Boolean.FALSE;
+    private Boolean isDeleted = Boolean.FALSE;
 
     public BaseEntity() {
     }
