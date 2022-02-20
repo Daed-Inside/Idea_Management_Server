@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import web.application.IdeaManagement.dto.PageDto;
 import web.application.IdeaManagement.manager.IdeaManager;
 import web.application.IdeaManagement.model.request.IdeaRequestModel;
@@ -26,12 +27,20 @@ public class IdeaController {
     JwtUtils jwtUtils;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createIdea(@RequestBody IdeaRequestModel req, HttpServletRequest request) {
+    public ResponseEntity<?> createIdea(@RequestParam("categoryId") Long categoryId,
+                                        @RequestParam("topicId") Long topicId,
+                                        @RequestParam("ideaTitle") String ideaTitle,
+                                        @RequestParam("ideaContent") String ideaContent,
+                                        @RequestParam("isAnonymous") Boolean isAnonymous,
+                                        @RequestParam("files") MultipartFile[] files,
+                                        HttpServletRequest request) {
         try {
             String jwt = jwtUtils.getJwtFromRequest(request);
-            Boolean result = ideaManager.createIdea(req);
-            if (result) {
+            Integer result = ideaManager.createIdea(categoryId, topicId, ideaTitle, ideaContent, isAnonymous, files);
+            if (result == 1) {
                 return responseUtils.getResponseEntity(null, 1, "Create Successfully", HttpStatus.OK);
+            } else if (result == -1) {
+                return responseUtils.getResponseEntity(null, -1, "The topic is closed", HttpStatus.OK);
             }
             return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
         } catch (Exception e) {
@@ -42,7 +51,7 @@ public class IdeaController {
     @PostMapping("/update")
     public ResponseEntity<?> updateIdea(@RequestBody IdeaRequestModel req) {
         try {
-            Boolean result = ideaManager.createIdea(req);
+            Boolean result = ideaManager.updateIdea(req);
             if (result) {
                 return responseUtils.getResponseEntity(null, 1, "Create Successfully", HttpStatus.OK);
             }
