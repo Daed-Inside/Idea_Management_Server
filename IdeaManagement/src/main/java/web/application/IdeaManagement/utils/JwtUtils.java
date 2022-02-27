@@ -29,7 +29,7 @@ public class JwtUtils {
 		System.out.println(jwtSecret);
 		Map<String, Object> mapClaim = new HashMap<>();
 		mapClaim.put("userId", userPrincipal.getId());
-		return Jwts.builder().setSubject((userPrincipal.getUsername())).setClaims(mapClaim).setIssuedAt(new Date())
+		return Jwts.builder().setClaims(mapClaim).setSubject((userPrincipal.getUsername())).setIssuedAt(new Date())
 				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
 				.signWith(SignatureAlgorithm.HS256, jwtSecret).compact();
 	}

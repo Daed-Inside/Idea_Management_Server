@@ -49,20 +49,23 @@ public class IdeaManager {
     @Autowired
     IdeaSpecification ideaSpecification;
 
-    public Integer createIdea(Long categoryId, Long topicId, String ideaTile, String ideaContent, Boolean isAnonymous, MultipartFile[] files) {
+    public Integer createIdea(Long categoryId, Long topicId, String ideaTile,
+                              String ideaContent, Boolean isAnonymous,
+                              MultipartFile[] files, String username, String userId) {
         try {
             Topic topic = topicRepository.findById(topicId).get();
             if (topic.getEndDate().before(new Date())) {
                 return -2;
             }
             Idea newIdea = new Idea();
+            newIdea.setUserId(userId);
             newIdea.setIsAnonymous(isAnonymous);
             newIdea.setTopicId(topicId);
             newIdea.setCategoryId(categoryId);
             newIdea.setIdeaContent(ideaContent);
             newIdea.setIdeaTitle(ideaTile);
             newIdea.setCreatedDate(new Date());
-//            newIdea.setCreatedUser(req.getUserId());
+            newIdea.setCreatedUser(username);
             Idea createdIdea =  ideaRepository.save(newIdea);
 
             List<IdeaAttachment> listAttachment = new ArrayList<>();
@@ -97,10 +100,12 @@ public class IdeaManager {
                             .path(saveFileName)
                             .toUriString();
                     ida.setIdeaId(createdIdea.getId());
+                    ida.setUserId(userId);
                     ida.setDownloadUrl(fileDownloadUri);
                     ida.setFileName(fileName);
                     ida.setPath(path.toAbsolutePath().toString());
                     ida.setCreatedDate(new Date());
+                    ida.setCreatedUser(username);
                     listAttachment.add(ida);
                 }
             }
@@ -114,7 +119,6 @@ public class IdeaManager {
 
     public Boolean updateIdea(IdeaRequestModel req) {
         try {
-
             Idea newIdea = ideaRepository.findById(req.getId()).get();
             newIdea.setIdeaContent(req.getIdeaContent() != null ? req.getIdeaContent() : newIdea.getIdeaContent());
             newIdea.setIdeaTitle(req.getIdeaTitle() != null ? req.getIdeaTitle() : newIdea.getIdeaTitle());
@@ -147,14 +151,15 @@ public class IdeaManager {
         }
     }
 
-    public PageDto getIdeaWithSpec(String searchKey) {
+    public PageDto getIdeaWithSpec(String searchKey, Integer page, Integer limit, String sortBy, String sortType) {
         try {
-            Sort sort = responseUtils.getSort("id", "DESC");
-            Page<Idea> listResult = ideaRepository.findAll(ideaSpecification.filterIdea(searchKey), PageRequest.of(0, 10, sort));
+            Integer pageNum = page -1;
+            Sort sort = responseUtils.getSort(sortBy, sortType);
+            Page<Idea> listResult = ideaRepository.findAll(ideaSpecification.filterIdea(searchKey), PageRequest.of(pageNum, limit, sort));
             return PageDto.builder()
                     .content(listResult.getContent())
                     .numberOfElements(listResult.getNumberOfElements())
-                    .page(listResult.getNumber())
+                    .page(page)
                     .size(listResult.getSize())
                     .totalPages(listResult.getTotalPages())
                     .totalElements(listResult.getTotalElements())

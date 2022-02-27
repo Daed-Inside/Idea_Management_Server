@@ -29,22 +29,16 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/authen")
 public class AuthenController {
-
     @Autowired
     AuthenticationManager authenticationManager;
-
     @Autowired
     UserRepository userDao;
-
     @Autowired
     RoleRepository roleDao;
-
     @Autowired
     PasswordEncoder encoder;
-
     @Autowired
     JwtUtils jwtUtils;
-
     @Autowired
     ResponseUtils responseUtils;
     @Autowired
@@ -52,7 +46,6 @@ public class AuthenController {
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-
         try {
             UserDetailManager userDetails = systemManager.login(loginRequest);
             if (userDetails != null) {
@@ -60,7 +53,7 @@ public class AuthenController {
                     return responseUtils.getResponseEntity(null, -1, "USER IS NOT EXIST", HttpStatus.BAD_REQUEST);
                 }
                 if (userDetails.getResponseMessage().equals("wrong_password")) {
-                    return responseUtils.getResponseEntity(null, -1, "WRONG PASSWORDT", HttpStatus.BAD_REQUEST);
+                    return responseUtils.getResponseEntity(null, -1, "WRONG PASSWORD", HttpStatus.BAD_REQUEST);
                 }
                 List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
                         .collect(Collectors.toList());

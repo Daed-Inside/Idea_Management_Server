@@ -17,6 +17,6 @@ public class IdeaReaction extends BaseEntity{
     private Long ideaId;
 
     @Column(name = "evaluation", nullable = false)
-    private Boolean evaluation;
+    private Integer evaluation;
 
 }
