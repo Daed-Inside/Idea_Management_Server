@@ -4,12 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import web.application.IdeaManagement.dto.PageDto;
+import web.application.IdeaManagement.entity.AcademicYear;
 import web.application.IdeaManagement.manager.AcademicYearManager;
-import web.application.IdeaManagement.model.request.AcademicYearRequestModel;
-import web.application.IdeaManagement.model.request.IdeaRequestModel;
-import web.application.IdeaManagement.model.response.AcademicYearResponseModel;
 import web.application.IdeaManagement.utils.JwtUtils;
 import web.application.IdeaManagement.utils.ResponseUtils;
 
@@ -48,46 +44,18 @@ public class AcademicYearController {
         }
     }
 
-    @PostMapping("/update")
-    public ResponseEntity<?> updateAcademicYear(@RequestBody AcademicYearRequestModel req) {
-        try {
-            Boolean result = academicYearManager.updateAcademicYear(req);
-            if (result) {
-                return responseUtils.getResponseEntity(null, 1, "Updated Successfully", HttpStatus.OK);
-            }
-            return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
-        } catch (Exception e) {
-            return responseUtils.getResponseEntity(e, -1, "Login fail!", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 
     @GetMapping("/get")
-    public ResponseEntity<?> getAcademicYearWithModel(@RequestParam String searchKey){
-        try{
-            List<AcademicYearResponseModel> result = academicYearManager.getAcademicYearWithModel(searchKey);
-            if (result != null) {
-                return responseUtils.getResponseEntity(result, 1, "Get Successfully", HttpStatus.OK);
-            }
-            return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
-
-        }catch (Exception e) {
-            return responseUtils.getResponseEntity(e, -1, "Login fail!", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-
-    @GetMapping("/get/specification")
     public ResponseEntity<?> getAcademicYearWithSpec(@RequestParam String searchKey) {
         try{
-            PageDto result = academicYearManager.getAcademicYearWithSpec(searchKey);
-            if (result != null) {
-                return responseUtils.getResponseEntity(result, 1, "Create Successfully", HttpStatus.OK);
+            List<AcademicYear> result = academicYearManager.getAcademicYearWithSpec(searchKey);
+            if(result != null){
+                return responseUtils.getResponseEntity(result, 1, "Get academic year list successfully", HttpStatus.OK);
             }
             return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
         }catch (Exception e) {
             return responseUtils.getResponseEntity(e, -1, "Login fail!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
 }
