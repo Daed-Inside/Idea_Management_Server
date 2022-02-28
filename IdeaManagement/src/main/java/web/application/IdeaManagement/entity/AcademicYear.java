@@ -10,6 +10,9 @@ import java.util.Date;
 @Table(name = "academic_year")
 public class AcademicYear extends BaseEntity{
 
+    @Column(name = "semester", length = 100, nullable = false)
+    private String semester;
+
     @Column(name = "year", length = 10, nullable = false)
     private String year;
 
