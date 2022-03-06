@@ -8,33 +8,36 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import web.application.IdeaManagement.dto.PageDto;
-import web.application.IdeaManagement.entity.*;
+import web.application.IdeaManagement.entity.AcademicYear;
+import web.application.IdeaManagement.entity.Department;
 import web.application.IdeaManagement.model.request.AcademicYearRequest;
+import web.application.IdeaManagement.model.request.DepartmentRequest;
 import web.application.IdeaManagement.repository.AcademicYearRepository;
+import web.application.IdeaManagement.repository.DepartmentRepository;
 import web.application.IdeaManagement.specification.AcademicYearSpecification;
+import web.application.IdeaManagement.specification.DepartmentSpecification;
 import web.application.IdeaManagement.utils.ResponseUtils;
 
 import java.util.Date;
-import java.util.List;
 
 @Service
 @Transactional
-public class AcademicYearManager {
+public class DepartmentManager {
     @Autowired
-    AcademicYearRepository academicYearRepository;
+    DepartmentRepository departmentRepository;
     @Autowired
     ResponseUtils responseUtils;
     @Autowired
     ModelMapper modelMapper;
     @Autowired
-    AcademicYearSpecification academicYearSpecification;
+    DepartmentSpecification departmentSpecification;
 
 
-    public Integer createAcademicYear(AcademicYearRequest req) {
+    public Integer createDepartment(DepartmentRequest reqBody) {
         try{
-            AcademicYear newAcademicYear = modelMapper.map(req, AcademicYear.class);
-            newAcademicYear.setCreatedDate(new Date());
-            academicYearRepository.save(newAcademicYear);
+            Department newDepartment = modelMapper.map(reqBody, Department.class);
+            newDepartment.setCreatedDate(new Date());
+            departmentRepository.save(newDepartment);
             return 1;
         }catch (Exception e){
             e.printStackTrace();
@@ -46,14 +49,14 @@ public class AcademicYearManager {
         try {
             Sort sort = responseUtils.getSort(sortBy, sortType);
             Integer pageNum = page - 1;
-            Page<AcademicYear> pageTopic = academicYearRepository.findAll(academicYearSpecification.filterAcademicYear(searchKey), PageRequest.of(pageNum, limit, sort));
+            Page<Department> pageDepartment = departmentRepository.findAll(departmentSpecification.filterDepartment(searchKey), PageRequest.of(pageNum, limit, sort));
             return PageDto.builder()
-                    .content(pageTopic.getContent())
-                    .numberOfElements(pageTopic.getNumberOfElements())
+                    .content(pageDepartment.getContent())
+                    .numberOfElements(pageDepartment.getNumberOfElements())
                     .page(page)
-                    .size(pageTopic.getSize())
-                    .totalPages(pageTopic.getTotalPages())
-                    .totalElements(pageTopic.getTotalElements())
+                    .size(pageDepartment.getSize())
+                    .totalPages(pageDepartment.getTotalPages())
+                    .totalElements(pageDepartment.getTotalElements())
                     .build();
         } catch (Exception e) {
             return null;
