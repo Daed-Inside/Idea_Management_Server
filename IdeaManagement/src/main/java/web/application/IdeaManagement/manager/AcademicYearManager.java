@@ -2,9 +2,14 @@ package web.application.IdeaManagement.manager;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import web.application.IdeaManagement.dto.PageDto;
 import web.application.IdeaManagement.entity.*;
+import web.application.IdeaManagement.model.request.AcademicYearRequest;
 import web.application.IdeaManagement.repository.AcademicYearRepository;
 import web.application.IdeaManagement.specification.AcademicYearSpecification;
 import web.application.IdeaManagement.utils.ResponseUtils;
@@ -25,15 +30,10 @@ public class AcademicYearManager {
     AcademicYearSpecification academicYearSpecification;
 
 
-    public Integer createAcademicYear(String semester, String year, Date startDate, Date endDate) {
+    public Integer createAcademicYear(AcademicYearRequest req) {
         try{
-            AcademicYear newAcademicYear = new AcademicYear();
-            newAcademicYear.setSemester(semester);
-            newAcademicYear.setYear(year);
-            newAcademicYear.setStartDate(startDate);
-            newAcademicYear.setEndDate(endDate);
+            AcademicYear newAcademicYear = modelMapper.map(req, AcademicYear.class);
             newAcademicYear.setCreatedDate(new Date());
-
             academicYearRepository.save(newAcademicYear);
             return 1;
         }catch (Exception e){
@@ -42,13 +42,20 @@ public class AcademicYearManager {
         }
     }
 
-
-    public List<AcademicYear> getAcademicYearWithSpec(String searchKey) {
-        try{
-            List<AcademicYear> listResult = academicYearRepository.findAll(academicYearSpecification.filterAcademic(searchKey));
-            return listResult;
-        }catch (Exception e) {
-            e.printStackTrace();
+    public PageDto getAcademicYear(String searchKey, Integer page, Integer limit, String sortBy, String sortType) {
+        try {
+            Sort sort = responseUtils.getSort(sortBy, sortType);
+            Integer pageNum = page - 1;
+            Page<AcademicYear> pageTopic = academicYearRepository.findAll(academicYearSpecification.filterAcademicYearByPage(searchKey), PageRequest.of(pageNum, limit, sort));
+            return PageDto.builder()
+                    .content(pageTopic.getContent())
+                    .numberOfElements(pageTopic.getNumberOfElements())
+                    .page(page)
+                    .size(pageTopic.getSize())
+                    .totalPages(pageTopic.getTotalPages())
+                    .totalElements(pageTopic.getTotalElements())
+                    .build();
+        } catch (Exception e) {
             return null;
         }
     }
