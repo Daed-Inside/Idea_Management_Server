@@ -31,7 +31,7 @@ public class TopicController {
         try {
             String jwt = jwtUtils.getJwtFromRequest(request);
             String username = jwtUtils.getUserNameFromJwtToken(jwt);
-            reqBody.setUser(username);
+            reqBody.setCreatedUser(username);
             Integer result = topicManager.createTopic(reqBody);
             if (result == 1) {
                 return responseUtils.getResponseEntity(null, 1, "Create Successfully", HttpStatus.OK);

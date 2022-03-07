@@ -13,5 +13,5 @@ public class TopicRequest {
     private Date endDate;
     private Date finalEndDate;
     private Date startDate;
-    private String user;
+    private String createdUser;
 }

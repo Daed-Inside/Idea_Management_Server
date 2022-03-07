@@ -32,6 +32,7 @@ public class TopicManager {
         try {
             Topic topic = modelMapper.map(req, Topic.class);
             topic.setCreatedDate(new Date());
+            topic.setStartDate(new Date());
             topicRepository.save(topic);
             return 1;
         } catch (Exception e) {

@@ -5,15 +5,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import web.application.IdeaManagement.dto.PageDto;
-import web.application.IdeaManagement.entity.AcademicYear;
 import web.application.IdeaManagement.manager.AcademicYearManager;
 import web.application.IdeaManagement.model.request.AcademicYearRequest;
 import web.application.IdeaManagement.utils.JwtUtils;
 import web.application.IdeaManagement.utils.ResponseUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.List;
+
 
 @CrossOrigin("*")
 @RestController

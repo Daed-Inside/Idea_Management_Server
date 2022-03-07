@@ -17,26 +17,30 @@ public class CategorySpecification {
     EntityManager entityManager;
 
 
-//    public List<CategoryResponseModel> getCategoryWithModel(String searchKey) {
-//        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-//        List<Predicate> predicates = new ArrayList<>();
-//        CriteriaQuery<CategoryResponseModel> query = cb.createQuery(CategoryResponseModel.class);
-//        Root<Category> root = query.from(Category.class);
-//
-//        if (!StringUtils.isEmpty(searchKey)) {
-//            predicates.add(cb.like(root.get("category"), "%" + searchKey + "%"));
-//        }
-//
-//
-//
-//
-//    }
-
     public Specification<Category> filterCategory(String searchKey){
+        //cb.isFalse(root.get("isDeleted").as(Boolean.class))
         return (root, query, cb) -> {
-             List<Predicate> predicates = new ArrayList<>();
+            List<Predicate> predicates = new ArrayList<>();
             if (!StringUtils.isEmpty(searchKey)) {
-                predicates.add(cb.like(root.get("category"), "%" + searchKey + "%"));
+                try {
+                    Long parseId = Long.parseLong(searchKey);
+                    predicates.add(
+                            cb.or(
+                                    cb.like(root.get("createdUser"), "%" + searchKey + "%"),
+                                    cb.like(root.get("category"), "%" + searchKey + "%"),
+                                    cb.equal(root.get("id"), parseId)
+                            )
+                    );
+//                    predicates.add(cb.isFalse(root.get("isDeleted").as(Boolean.class)));
+                } catch (Exception e) {
+                    predicates.add(
+                            cb.or(
+                                    cb.like(root.get("createdUser"), "%" + searchKey + "%"),
+                                    cb.like(root.get("category"), "%" + searchKey + "%")
+                            )
+                    );
+//                    predicates.add(cb.isFalse(root.get("isDeleted").as(Boolean.class)));
+                }
             }
             return cb.and(predicates.stream().toArray(Predicate[]::new));
         };

@@ -4,13 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import web.application.IdeaManagement.entity.Category;
+import web.application.IdeaManagement.dto.PageDto;
 import web.application.IdeaManagement.manager.CategoryManager;
+import web.application.IdeaManagement.model.request.CategoryRequest;
 import web.application.IdeaManagement.utils.JwtUtils;
 import web.application.IdeaManagement.utils.ResponseUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @CrossOrigin("*")
 @RestController
@@ -24,15 +24,17 @@ public class CategoryController {
     JwtUtils jwtUtils;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createCategory(@RequestParam("category") String category,
-                                        @RequestParam("topicId") Long topicId,
-                                        HttpServletRequest request) {
+    public ResponseEntity<?> createCategory (@RequestBody CategoryRequest reqBody,
+                                               HttpServletRequest request){
         try{
-            Integer result = categoryManager.createCategory(category, topicId);
-            if(result == 1){
-                return responseUtils.getResponseEntity(null, 1, "Create category Successfully", HttpStatus.OK);
-            }else if(result == 2){
-                return responseUtils.getResponseEntity(null, -1, "The category already exists", HttpStatus.OK);
+            String jwt = jwtUtils.getJwtFromRequest(request);
+            String username = jwtUtils.getUserNameFromJwtToken(jwt);
+            reqBody.setCreatedUser(username);
+            Integer result = categoryManager.createCategory(reqBody);
+            if (result == 1) {
+                return responseUtils.getResponseEntity(null, 1, "Create Successfully", HttpStatus.OK);
+            } else if (result == -1) {
+                return responseUtils.getResponseEntity(null, -1, "Fail to create department", HttpStatus.OK);
             }
             return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
         }catch (Exception e) {
@@ -41,13 +43,17 @@ public class CategoryController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteCategory(@RequestParam("categoryId") Long categoryId){
+    public ResponseEntity<?> deleteCategory(@RequestParam("categoryId") Long categoryId, HttpServletRequest request){
         try{
-            Integer result = categoryManager.deleteCategory(categoryId);
+            String jwt = jwtUtils.getJwtFromRequest(request);
+            String username = jwtUtils.getUserNameFromJwtToken(jwt);
+            Integer result = categoryManager.deleteCategory(categoryId, username);
             if(result == 1){
                 return responseUtils.getResponseEntity(null, 1, "Delete category Successfully", HttpStatus.OK);
-            }else if (result == -2){
+            }else if (result == -1){
                 return responseUtils.getResponseEntity(null, -1, "Category is being used", HttpStatus.OK);
+            }else if (result == -2){
+                return responseUtils.getResponseEntity(null, -1, "Category does not exist", HttpStatus.OK);
             }
             return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
         }catch (Exception e) {
@@ -55,25 +61,17 @@ public class CategoryController {
         }
     }
 
-    @GetMapping("/getAll")
-    public ResponseEntity<?> getAllCategory(){
-        try{
-            List<Category> result = categoryManager.getAllCategory();
-            if(result != null){
-                return responseUtils.getResponseEntity(result, 1, "Get category list successfully", HttpStatus.OK);
-            }
-            return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
-        }catch (Exception e) {
-            return responseUtils.getResponseEntity(e, -1, "Login fail!", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 
     @GetMapping("/get")
-    public ResponseEntity<?> getCategoryWithSpec(@RequestParam String searchKey){
+    public ResponseEntity<?> getCategoryWithSpec(@RequestParam(value = "searchKey",required = false) String searchKey,
+                                                   @RequestParam("page") Integer page,
+                                                   @RequestParam("limit") Integer limit,
+                                                   @RequestParam("sortBy") String sortBy,
+                                                   @RequestParam("sortType") String sortType) {
         try{
-            List<Category> result = categoryManager.getCategoryWithSpec(searchKey);
-            if(result != null){
-                return responseUtils.getResponseEntity(result, 1, "Get category list successfully", HttpStatus.OK);
+            PageDto result = categoryManager.getCategory(searchKey, page, limit, sortBy, sortType);
+            if (result != null) {
+                return responseUtils.getResponseEntity(result, 1, "Get Successfully", HttpStatus.OK);
             }
             return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
         }catch (Exception e) {

@@ -2,9 +2,16 @@ package web.application.IdeaManagement.manager;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import web.application.IdeaManagement.dto.PageDto;
 import web.application.IdeaManagement.entity.Category;
+import web.application.IdeaManagement.entity.Department;
+import web.application.IdeaManagement.model.request.CategoryRequest;
+import web.application.IdeaManagement.model.request.DepartmentRequest;
 import web.application.IdeaManagement.repository.CategoryRepository;
 import web.application.IdeaManagement.repository.IdeaRepository;
 import web.application.IdeaManagement.specification.CategorySpecification;
@@ -31,31 +38,30 @@ public class CategoryManager {
     @PersistenceContext
     EntityManager entityManager;
 
-    public Integer createCategory(String category, Long topicId) {
+    public Integer createCategory(CategoryRequest reqBody) {
         try{
-            if(categoryRepository.existsByCategory(category)){
-                return -2;
-            }
-            Category newCategory = new Category();
-            newCategory.setCategory(category);
-            newCategory.setTopicId(topicId);
+            Category newCategory = modelMapper.map(reqBody, Category.class);
             newCategory.setCreatedDate(new Date());
             categoryRepository.save(newCategory);
             return 1;
-        } catch (Exception e) {
+        }catch (Exception e){
             e.printStackTrace();
             return -1;
         }
     }
 
-    public Integer deleteCategory(Long categoryId) {
+    public Integer deleteCategory(Long categoryId, String username) {
         try{
             if(ideaRepository.existsByCategoryId(categoryId)){
-                return -2;
+                return -1;
             }
             Category deleleCategory = categoryRepository.findById(categoryId).get();
+            if(deleleCategory.getIsDeleted()){
+                return -2;
+            }
             deleleCategory.setIsDeleted(true);
             deleleCategory.setModifiedDate(new Date());
+            deleleCategory.setModifiedUser(username);
             categoryRepository.save(deleleCategory);
             return 1;
         }catch (Exception e) {
@@ -63,22 +69,21 @@ public class CategoryManager {
         }
     }
 
-    public List<Category> getCategoryWithSpec(String searchKey) {
-        try{
-            List<Category> listResult = categoryRepository.findAll(categorySpecification.filterCategory(searchKey));
-            return listResult;
-        }catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
-    public List<Category> getAllCategory() {
-        try{
-            List<Category> listResult = categoryRepository.findAll();
-            return listResult;
-        }catch (Exception e) {
-            e.printStackTrace();
+    public PageDto getCategory(String searchKey, Integer page, Integer limit, String sortBy, String sortType) {
+        try {
+            Sort sort = responseUtils.getSort(sortBy, sortType);
+            Integer pageNum = page - 1;
+            Page<Category> pageCategory = categoryRepository.findAll(categorySpecification.filterCategory(searchKey), PageRequest.of(pageNum, limit, sort));
+            return PageDto.builder()
+                    .content(pageCategory.getContent())
+                    .numberOfElements(pageCategory.getNumberOfElements())
+                    .page(page)
+                    .size(pageCategory.getSize())
+                    .totalPages(pageCategory.getTotalPages())
+                    .totalElements(pageCategory.getTotalElements())
+                    .build();
+        } catch (Exception e) {
             return null;
         }
     }
