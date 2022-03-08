@@ -25,21 +25,25 @@ public class CategorySpecification {
                 try {
                     Long parseId = Long.parseLong(searchKey);
                     predicates.add(
-                            cb.or(
-                                    cb.like(root.get("createdUser"), "%" + searchKey + "%"),
-                                    cb.like(root.get("category"), "%" + searchKey + "%"),
-                                    cb.equal(root.get("id"), parseId)
+                            cb.and(
+                                    cb.or(
+                                        cb.like(root.get("createdUser"), "%" + searchKey + "%"),
+                                        cb.like(root.get("category"), "%" + searchKey + "%"),
+                                        cb.equal(root.get("id"), parseId)
+                                    ),
+                                    cb.isFalse(root.get("isDeleted").as(Boolean.class))
                             )
                     );
-//                    predicates.add(cb.isFalse(root.get("isDeleted").as(Boolean.class)));
                 } catch (Exception e) {
                     predicates.add(
-                            cb.or(
-                                    cb.like(root.get("createdUser"), "%" + searchKey + "%"),
-                                    cb.like(root.get("category"), "%" + searchKey + "%")
+                            cb.and(
+                                    cb.or(
+                                            cb.like(root.get("createdUser"), "%" + searchKey + "%"),
+                                            cb.like(root.get("category"), "%" + searchKey + "%")
+                                    ),
+                                    cb.isFalse(root.get("isDeleted").as(Boolean.class))
                             )
                     );
-//                    predicates.add(cb.isFalse(root.get("isDeleted").as(Boolean.class)));
                 }
             }
             return cb.and(predicates.stream().toArray(Predicate[]::new));
