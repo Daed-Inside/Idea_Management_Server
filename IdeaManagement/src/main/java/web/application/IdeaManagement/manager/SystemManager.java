@@ -24,8 +24,8 @@ public class SystemManager {
         try {
             String username = request.getEmail().substring(0, request.getEmail().indexOf("@"));
             UserDetailManager userDetails = new UserDetailManager();
-            Boolean existUser = userRepository.existsByEmail(request.getEmail());
-            if (!existUser) {
+            User existUser = userRepository.findByEmail(request.getEmail());
+            if (existUser == null) {
                 userDetails.setResponseMessage("user_not_exist");
                 return userDetails;
             } else {
@@ -37,6 +37,8 @@ public class SystemManager {
                     userDetails = (UserDetailManager) authentication.getPrincipal();
                     userDetails.setJwt(jwt);
                     userDetails.setResponseMessage("success");
+                    userDetails.setFirstname(existUser.getFirstname());
+                    userDetails.setLastname(existUser.getLastname());
                     return userDetails;
                 } catch (Exception e) {
                     e.printStackTrace();

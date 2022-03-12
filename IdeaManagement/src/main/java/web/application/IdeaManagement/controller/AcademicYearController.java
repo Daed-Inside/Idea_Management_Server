@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/academicyear")
+@RequestMapping("/academic-year")
 public class AcademicYearController {
     @Autowired
     AcademicYearManager academicYearManager;
@@ -25,7 +25,7 @@ public class AcademicYearController {
     JwtUtils jwtUtils;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createAcademicYear (@RequestBody AcademicYearRequest reqBody,
+    public ResponseEntity<?> createAcademicYear(@RequestBody AcademicYearRequest reqBody,
                                                  HttpServletRequest request){
         try{
             String jwt = jwtUtils.getJwtFromRequest(request);

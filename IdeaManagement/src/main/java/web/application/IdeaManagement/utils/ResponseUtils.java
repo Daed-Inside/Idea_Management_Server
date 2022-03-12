@@ -28,4 +28,15 @@ public class ResponseUtils {
         }
         return sort;
     }
+
+    public Integer getPageCount(Long totalItems, Integer limit) {
+        if (totalItems > 0 && totalItems % limit == 0) {
+            return Math.toIntExact(totalItems / limit);
+        } else if (totalItems > 0 && totalItems % limit> 0) {
+            return Math.toIntExact((totalItems / limit) + 1);
+        } else if (totalItems < limit) {
+            return 1;
+        }
+        return 0;
+    }
 }

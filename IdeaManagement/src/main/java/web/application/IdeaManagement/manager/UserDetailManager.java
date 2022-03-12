@@ -18,6 +18,10 @@ public class UserDetailManager implements UserDetails {
 
     private String username;
 
+    private String firstname;
+
+    private String lastname;
+
     private String email;
 
     private String responseMessage;
@@ -40,6 +44,22 @@ public class UserDetailManager implements UserDetails {
         this.responseMessage = responseMessage;
     }
 
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
     @JsonIgnore
     private String password;
 
@@ -49,10 +69,12 @@ public class UserDetailManager implements UserDetails {
 
     }
 
-    public UserDetailManager(String id, String username, String email, String password,
+    public UserDetailManager(String id, String username, String firstname, String lastname, String email, String password,
                              String responseMessage, String jwt,
                              Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
+        this.firstname = firstname;
+        this.lastname = lastname;
         this.username = username;
         this.email = email;
         this.password = password;
@@ -69,6 +91,8 @@ public class UserDetailManager implements UserDetails {
         return new UserDetailManager(
                 user.getUserId(),
                 user.getUsername(),
+                user.getFirstname(),
+                user.getLastname(),
                 user.getEmail(),
                 user.getPassword(),
                 user.getResponseMessage(),

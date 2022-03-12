@@ -2,6 +2,7 @@ package web.application.IdeaManagement.controller;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import web.application.IdeaManagement.manager.UserDetailManager;
 import web.application.IdeaManagement.model.request.LoginRequest;
 import web.application.IdeaManagement.model.request.SignupRequest;
 import web.application.IdeaManagement.model.response.JwtResponse;
+import web.application.IdeaManagement.model.response.UserInfoResponse;
 import web.application.IdeaManagement.repository.RoleRepository;
 import web.application.IdeaManagement.repository.UserRepository;
 import web.application.IdeaManagement.utils.JwtUtils;
@@ -43,6 +45,8 @@ public class AuthenController {
     ResponseUtils responseUtils;
     @Autowired
     SystemManager systemManager;
+    @Autowired
+    ModelMapper modelMapper;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
@@ -57,8 +61,9 @@ public class AuthenController {
                 }
                 List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
                         .collect(Collectors.toList());
+                UserInfoResponse userInfo = modelMapper.map(userDetails, UserInfoResponse.class);
                 return responseUtils.getResponseEntity(
-                        new JwtResponse(userDetails.getJwt(), userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), roles),1,"Login success!", HttpStatus.OK);
+                        new JwtResponse(userDetails.getJwt(), userInfo, roles),1,"Login success!", HttpStatus.OK);
             }
             return responseUtils.getResponseEntity(null, -1, "SERVER ERROR", HttpStatus.BAD_REQUEST);
         }catch (Exception e) {

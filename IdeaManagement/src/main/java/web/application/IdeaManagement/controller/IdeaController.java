@@ -28,12 +28,13 @@ public class IdeaController {
     JwtUtils jwtUtils;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createIdea(@RequestParam("categoryId") Long categoryId,
+    public ResponseEntity<?> createIdea(@RequestParam("departmentId") Long departmentId,
+                                        @RequestParam("categoryId") Long categoryId,
                                         @RequestParam("topicId") Long topicId,
-                                        @RequestParam("ideaTitle") String ideaTitle,
-                                        @RequestParam("ideaContent") String ideaContent,
-                                        @RequestParam("isAnonymous") Boolean isAnonymous,
-                                        @RequestParam("files") MultipartFile[] files,
+                                        @RequestParam("title") String ideaTitle,
+                                        @RequestParam("description") String ideaContent,
+                                        @RequestParam("contributor") Boolean isAnonymous,
+                                        @RequestParam(value = "files", required = false) MultipartFile[] files,
                                         HttpServletRequest request) {
         try {
             String jwt = jwtUtils.getJwtFromRequest(request);
@@ -42,8 +43,8 @@ public class IdeaController {
             Integer result = ideaManager.createIdea(categoryId, topicId, ideaTitle, ideaContent, isAnonymous, files, username, userId);
             if (result == 1) {
                 return responseUtils.getResponseEntity(null, 1, "Create Successfully", HttpStatus.OK);
-            } else if (result == -1) {
-                return responseUtils.getResponseEntity(null, -1, "The topic is closed", HttpStatus.OK);
+            } else if (result == -2) {
+                return responseUtils.getResponseEntity(null, -2, "The topic is closed", HttpStatus.OK);
             }
             return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
         } catch (Exception e) {
@@ -78,7 +79,7 @@ public class IdeaController {
     }
 
     @GetMapping("/get/specification")
-    public ResponseEntity<?> getIdeaWithSpec(@RequestParam(value = "searchKey",required = false) String searchKey,
+    public ResponseEntity<?> getIdeaWithSpec(@RequestParam(value = "searchKey", required = false) String searchKey,
                                              @RequestParam("page") Integer page,
                                              @RequestParam("limit") Integer limit,
                                              @RequestParam("sortBy") String sortBy,

@@ -53,10 +53,10 @@ public class IdeaManager {
                               String ideaContent, Boolean isAnonymous,
                               MultipartFile[] files, String username, String userId) {
         try {
-            Topic topic = topicRepository.findById(topicId).get();
-            if (topic.getEndDate().before(new Date())) {
-                return -2;
-            }
+//            Topic topic = topicRepository.findById(topicId).get();
+//            if (topic.getEndDate().before(new Date())) {
+//                return -2;
+//            }
             Idea newIdea = new Idea();
             newIdea.setUserId(userId);
             newIdea.setIsAnonymous(isAnonymous);
@@ -94,7 +94,7 @@ public class IdeaManager {
                         e.printStackTrace();
                     }
 
-                    String fileDownloadUri = ServletUriComponentsBuilder.fromHttpUrl("http://localhost:8080")
+                    String fileDownloadUri = ServletUriComponentsBuilder.fromHttpUrl("http://fc4e-1-55-198-254.ngrok.io")
                             .path("/file/download/")
                             .path("idea" + "/")
                             .path(saveFileName)

@@ -12,6 +12,8 @@ import web.application.IdeaManagement.entity.Category;
 import web.application.IdeaManagement.entity.Department;
 import web.application.IdeaManagement.model.request.CategoryRequest;
 import web.application.IdeaManagement.model.request.DepartmentRequest;
+import web.application.IdeaManagement.model.response.CategoryReponse;
+import web.application.IdeaManagement.model.response.TopicResponse;
 import web.application.IdeaManagement.repository.CategoryRepository;
 import web.application.IdeaManagement.repository.IdeaRepository;
 import web.application.IdeaManagement.specification.CategorySpecification;
@@ -21,6 +23,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -72,16 +75,17 @@ public class CategoryManager {
 
     public PageDto getCategory(String searchKey, Integer page, Integer limit, String sortBy, String sortType) {
         try {
-            Sort sort = responseUtils.getSort(sortBy, sortType);
-            Integer pageNum = page - 1;
-            Page<Category> pageCategory = categoryRepository.findAll(categorySpecification.filterCategory(searchKey), PageRequest.of(pageNum, limit, sort));
+            Map<String, Object> mapCategory = categorySpecification.getDataCategory(searchKey, page, limit, sortBy, sortType);
+            List<CategoryReponse> listRes = (List<CategoryReponse>) mapCategory.get("data");
+            Long totalItems = (Long) mapCategory.get("count");
+            Integer totalPage = responseUtils.getPageCount(totalItems, limit);
             return PageDto.builder()
-                    .content(pageCategory.getContent())
-                    .numberOfElements(pageCategory.getNumberOfElements())
+                    .content(listRes)
+                    .numberOfElements(Math.toIntExact(totalItems))
                     .page(page)
-                    .size(pageCategory.getSize())
-                    .totalPages(pageCategory.getTotalPages())
-                    .totalElements(pageCategory.getTotalElements())
+                    .size(limit)
+                    .totalPages(totalPage)
+                    .totalElements(totalItems)
                     .build();
         } catch (Exception e) {
             return null;
