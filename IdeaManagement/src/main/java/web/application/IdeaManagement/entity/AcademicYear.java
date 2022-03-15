@@ -13,7 +13,7 @@ public class AcademicYear extends BaseEntity{
     @Column(name = "semester", length = 100, nullable = false)
     private String semester;
 
-    @Column(name = "year", length = 10, nullable = false)
+    @Column(name = "year", length = 20, nullable = false)
     private String year;
 
     @Column(name = "start_date", nullable = false)
