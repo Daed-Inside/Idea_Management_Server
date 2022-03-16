@@ -45,7 +45,7 @@ public class DepartmentManager {
         }
     }
 
-    public PageDto getAcademicYear(String searchKey, Integer page, Integer limit, String sortBy, String sortType) {
+    public PageDto getDepartment(String searchKey, Integer page, Integer limit, String sortBy, String sortType) {
         try {
             Sort sort = responseUtils.getSort(sortBy, sortType);
             Integer pageNum = page - 1;

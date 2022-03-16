@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import web.application.IdeaManagement.dto.PageDto;
 import web.application.IdeaManagement.entity.*;
 import web.application.IdeaManagement.model.request.AcademicYearRequest;
+import web.application.IdeaManagement.model.response.AcademicYearReponse;
 import web.application.IdeaManagement.repository.AcademicYearRepository;
 import web.application.IdeaManagement.specification.AcademicYearSpecification;
 import web.application.IdeaManagement.utils.ResponseUtils;
@@ -56,6 +57,24 @@ public class AcademicYearManager {
                     .totalElements(pageTopic.getTotalElements())
                     .build();
         } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public List<AcademicYearReponse> getSemesterByYear(String year) {
+        try{
+            List<AcademicYearReponse> listResult = academicYearSpecification.getSemeserByYear(year);
+            return listResult;
+        }catch (Exception e) {
+            return null;
+        }
+    }
+
+    public List<AcademicYear> getSemesterByYearTemp(String year) {
+        try{
+            List<AcademicYear> listResult = academicYearRepository.findAllByYear(year);
+            return listResult;
+        }catch (Exception e) {
             return null;
         }
     }
