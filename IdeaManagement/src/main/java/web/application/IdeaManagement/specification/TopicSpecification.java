@@ -64,7 +64,7 @@ public class TopicSpecification {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(cb.equal(root.get("academicId"), rootAcad.get("id")));
             predicates.add(cb.equal(root.get("departmentId"), rootDept.get("id")));
-            if (StringUtils.isEmpty(searchKey)) {
+            if (!StringUtils.isEmpty(searchKey)) {
                 predicates.add(cb.or(cb.like(cb.lower(root.get("topic")), "%" + searchKey.toLowerCase() + "%"),
                         cb.like(cb.lower(rootDept.get("department")), "%" + searchKey.toLowerCase() + "%"),
                         cb.like(cb.lower(rootAcad.get("semester")), "%" + searchKey.toLowerCase() + "%")));
@@ -73,6 +73,18 @@ public class TopicSpecification {
             //----------------------SUBQUERY COUNT-----------------------------//
             CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
             Root<Topic> rootCount = countQuery.from(Topic.class);
+
+            Root<Department> rootDeptCount = countQuery.from(Department.class);
+            Root<AcademicYear> rootAcadCount = countQuery.from(AcademicYear.class);
+            List<Predicate> predicatesCount = new ArrayList<>();
+            predicatesCount.add(cb.equal(rootCount.get("academicId"), rootAcadCount.get("id")));
+            predicatesCount.add(cb.equal(rootCount.get("departmentId"), rootDeptCount.get("id")));
+            if (!StringUtils.isEmpty(searchKey)) {
+                predicatesCount.add(cb.or(cb.like(cb.lower(rootCount.get("topic")), "%" + searchKey.toLowerCase() + "%"),
+                        cb.like(cb.lower(rootDeptCount.get("department")), "%" + searchKey.toLowerCase() + "%"),
+                        cb.like(cb.lower(rootAcadCount.get("semester")), "%" + searchKey.toLowerCase() + "%")));
+            }
+
             //------------------------CREATE SORT-----------------------------//
             if (sortType.equalsIgnoreCase("asc")) {
                 switch (sortBy) {
@@ -107,12 +119,13 @@ public class TopicSpecification {
             List<TopicResponse> listResult = entityManager.createQuery(query) != null ? entityManager.createQuery(query).
                     setFirstResult((page - 1) * limit)
                     .setMaxResults(limit).getResultList() : new ArrayList<>();
-            countQuery.select(cb.count(rootCount)).where(cb.and(predicates.stream().toArray(Predicate[]::new)));
+            countQuery.select(cb.count(rootCount)).where(cb.and(predicatesCount.stream().toArray(Predicate[]::new)));
             Long count = entityManager.createQuery(countQuery).getSingleResult();
             mapFinal.put("data", listResult);
             mapFinal.put("count", count);
             return mapFinal;
         } catch (Exception e) {
+            e.printStackTrace();
             return new HashMap<>();
         }
     }
