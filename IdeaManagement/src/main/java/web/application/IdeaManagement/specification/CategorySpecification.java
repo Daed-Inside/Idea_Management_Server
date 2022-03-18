@@ -69,6 +69,7 @@ public class CategorySpecification {
             Root<Topic> rootTopic = query.from(Topic.class);
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(cb.equal(root.get("topicId"), rootTopic.get("id")));
+            predicates.add(cb.isFalse(root.get("isDeleted").as(Boolean.class)));
             if (topicId != null) {
                 predicates.add(cb.equal(root.get("topicId"), topicId));
             }
@@ -76,23 +77,17 @@ public class CategorySpecification {
                 try {
                     Long parseId = Long.parseLong(searchKey);
                     predicates.add(
-                            cb.and(
-                                    cb.or(
-                                            cb.like(root.get("createdUser"), "%" + searchKey + "%"),
-                                            cb.like(root.get("category"), "%" + searchKey + "%"),
-                                            cb.equal(root.get("id"), parseId)
-                                    ),
-                                    cb.isFalse(root.get("isDeleted").as(Boolean.class))
+                            cb.or(
+                                    cb.like(root.get("createdUser"), "%" + searchKey + "%"),
+                                    cb.like(root.get("category"), "%" + searchKey + "%"),
+                                    cb.equal(root.get("id"), parseId)
                             )
                     );
                 } catch (Exception e) {
                     predicates.add(
-                            cb.and(
-                                    cb.or(
-                                            cb.like(root.get("createdUser"), "%" + searchKey + "%"),
-                                            cb.like(root.get("category"), "%" + searchKey + "%")
-                                    ),
-                                    cb.isFalse(root.get("isDeleted").as(Boolean.class))
+                            cb.or(
+                                    cb.like(root.get("createdUser"), "%" + searchKey + "%"),
+                                    cb.like(root.get("category"), "%" + searchKey + "%")
                             )
                     );
                 }
@@ -102,36 +97,29 @@ public class CategorySpecification {
             CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
             Root<Category> rootCount = countQuery.from(Category.class);
 
-            Root<Topic> rootTopicCount = query.from(Topic.class);
+            Root<Topic> rootTopicCount = countQuery.from(Topic.class);
             List<Predicate> predicatesCount = new ArrayList<>();
             predicatesCount.add(cb.equal(rootCount.get("topicId"), rootTopicCount.get("id")));
+            predicatesCount.add(cb.isFalse(rootCount.get("isDeleted").as(Boolean.class)));
             if (!StringUtils.isEmpty(searchKey)) {
                 try {
                     Long parseId = Long.parseLong(searchKey);
                     predicatesCount.add(
-                            cb.and(
-                                    cb.or(
-                                            cb.like(rootCount.get("createdUser"), "%" + searchKey + "%"),
-                                            cb.like(rootCount.get("category"), "%" + searchKey + "%"),
-                                            cb.equal(rootCount.get("id"), parseId)
-                                    ),
-                                    cb.isFalse(rootCount.get("isDeleted").as(Boolean.class))
+                            cb.or(
+                                    cb.like(rootCount.get("createdUser"), "%" + searchKey + "%"),
+                                    cb.like(rootCount.get("category"), "%" + searchKey + "%"),
+                                    cb.equal(rootCount.get("id"), parseId)
                             )
                     );
                 } catch (Exception e) {
                     predicatesCount.add(
-                            cb.and(
-                                    cb.or(
-                                            cb.like(rootCount.get("createdUser"), "%" + searchKey + "%"),
-                                            cb.like(rootCount.get("category"), "%" + searchKey + "%")
-                                    ),
-                                    cb.isFalse(rootCount.get("isDeleted").as(Boolean.class))
+                            cb.or(
+                                    cb.like(rootCount.get("createdUser"), "%" + searchKey + "%"),
+                                    cb.like(rootCount.get("category"), "%" + searchKey + "%")
                             )
                     );
                 }
             }
-
-
 
 
             //------------------CREATE SORT-----------------------------//

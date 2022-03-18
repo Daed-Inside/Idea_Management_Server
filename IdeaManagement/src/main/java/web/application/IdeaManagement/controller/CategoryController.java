@@ -24,9 +24,9 @@ public class CategoryController {
     JwtUtils jwtUtils;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createCategory (@RequestBody CategoryRequest reqBody,
-                                               HttpServletRequest request){
-        try{
+    public ResponseEntity<?> createCategory(@RequestBody CategoryRequest reqBody,
+                                            HttpServletRequest request) {
+        try {
             String jwt = jwtUtils.getJwtFromRequest(request);
             String username = jwtUtils.getUserNameFromJwtToken(jwt);
             reqBody.setCreatedUser(username);
@@ -37,44 +37,45 @@ public class CategoryController {
                 return responseUtils.getResponseEntity(null, -1, "Fail to create department", HttpStatus.OK);
             }
             return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
-        }catch (Exception e) {
+        } catch (Exception e) {
             return responseUtils.getResponseEntity(e, -1, "Login fail!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteCategory(@RequestParam("categoryId") Long categoryId, HttpServletRequest request){
-        try{
+    public ResponseEntity<?> deleteCategory(@RequestParam("categoryId") Long categoryId, HttpServletRequest request) {
+        try {
             String jwt = jwtUtils.getJwtFromRequest(request);
             String username = jwtUtils.getUserNameFromJwtToken(jwt);
             Integer result = categoryManager.deleteCategory(categoryId, username);
-            if(result == 1){
+            if (result == 1) {
                 return responseUtils.getResponseEntity(null, 1, "Delete category Successfully", HttpStatus.OK);
-            }else if (result == -1){
+            } else if (result == -1) {
                 return responseUtils.getResponseEntity(null, -1, "Category is being used", HttpStatus.OK);
-            }else if (result == -2){
+            } else if (result == -2) {
                 return responseUtils.getResponseEntity(null, -1, "Category does not exist", HttpStatus.OK);
             }
             return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
-        }catch (Exception e) {
+        } catch (Exception e) {
             return responseUtils.getResponseEntity(e, -1, "Login fail!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
 
     @GetMapping("/get")
-    public ResponseEntity<?> getCategoryWithSpec(@RequestParam(value = "searchKey",required = false) String searchKey,
-                                                   @RequestParam("page") Integer page,
-                                                   @RequestParam("limit") Integer limit,
-                                                   @RequestParam("sortBy") String sortBy,
-                                                   @RequestParam("sortType") String sortType) {
-        try{
-            PageDto result = categoryManager.getCategory(searchKey, page, limit, sortBy, sortType);
+    public ResponseEntity<?> getCategoryWithSpec(@RequestParam(value = "searchKey", required = false) String searchKey,
+                                                 @RequestParam(value = "topicId", required = false) Long topicId,
+                                                 @RequestParam("page") Integer page,
+                                                 @RequestParam("limit") Integer limit,
+                                                 @RequestParam("sortBy") String sortBy,
+                                                 @RequestParam("sortType") String sortType) {
+        try {
+            PageDto result = categoryManager.getCategory(searchKey, topicId, page, limit, sortBy, sortType);
             if (result != null) {
                 return responseUtils.getResponseEntity(result, 1, "Get Successfully", HttpStatus.OK);
             }
             return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
-        }catch (Exception e) {
+        } catch (Exception e) {
             return responseUtils.getResponseEntity(e, -1, "Login fail!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
