@@ -101,6 +101,39 @@ public class CategorySpecification {
             //------------------CREATE COUNT QUERY-----------------------//
             CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
             Root<Category> rootCount = countQuery.from(Category.class);
+
+            Root<Topic> rootTopicCount = query.from(Topic.class);
+            List<Predicate> predicatesCount = new ArrayList<>();
+            predicatesCount.add(cb.equal(rootCount.get("topicId"), rootTopicCount.get("id")));
+            if (!StringUtils.isEmpty(searchKey)) {
+                try {
+                    Long parseId = Long.parseLong(searchKey);
+                    predicatesCount.add(
+                            cb.and(
+                                    cb.or(
+                                            cb.like(rootCount.get("createdUser"), "%" + searchKey + "%"),
+                                            cb.like(rootCount.get("category"), "%" + searchKey + "%"),
+                                            cb.equal(rootCount.get("id"), parseId)
+                                    ),
+                                    cb.isFalse(rootCount.get("isDeleted").as(Boolean.class))
+                            )
+                    );
+                } catch (Exception e) {
+                    predicatesCount.add(
+                            cb.and(
+                                    cb.or(
+                                            cb.like(rootCount.get("createdUser"), "%" + searchKey + "%"),
+                                            cb.like(rootCount.get("category"), "%" + searchKey + "%")
+                                    ),
+                                    cb.isFalse(rootCount.get("isDeleted").as(Boolean.class))
+                            )
+                    );
+                }
+            }
+
+
+
+
             //------------------CREATE SORT-----------------------------//
             if (sortType.equalsIgnoreCase("asc")) {
                 switch (sortBy) {
@@ -126,14 +159,12 @@ public class CategorySpecification {
             query.multiselect(
                     root.get("id"),
                     root.get("category"),
-                    rootTopic.get("topic"),
-                    root.get("createdDate"),
-                    root.get("createdUser")
+                    rootTopic.get("topic")
             ).where(cb.and(predicates.stream().toArray(Predicate[]::new)));
             List<CategoryReponse> listResult = entityManager.createQuery(query) != null ? entityManager.createQuery(query).
                     setFirstResult((page - 1) * limit)
                     .setMaxResults(limit).getResultList() : new ArrayList<>();
-            countQuery.select(cb.count(rootCount)).where(cb.and(predicates.stream().toArray(Predicate[]::new)));
+            countQuery.select(cb.count(rootCount)).where(cb.and(predicatesCount.stream().toArray(Predicate[]::new)));
             Long count = entityManager.createQuery(countQuery).getSingleResult();
             mapFinal.put("data", listResult);
             mapFinal.put("count", count);

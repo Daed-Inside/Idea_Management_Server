@@ -7,7 +7,7 @@ import java.util.Date;
 @Data
 public class TopicResponse {
     private Long id;
-    private Long topic;
+    private String topic;
     private String year;
     private String semester;
     private String department;
@@ -15,7 +15,7 @@ public class TopicResponse {
     private Date closureDate;
     private Date finalDate;
 
-    public TopicResponse(Long id, Long topic, String year, String semester, String department, Date startDate, Date closureDate, Date finalDate) {
+    public TopicResponse(Long id, String topic, String year, String semester, String department, Date startDate, Date closureDate, Date finalDate) {
         this.id = id;
         this.topic = topic;
         this.year = year;

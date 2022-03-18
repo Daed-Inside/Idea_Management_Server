@@ -52,7 +52,7 @@ public class DepartmentController {
                                                      @RequestParam("sortBy") String sortBy,
                                                      @RequestParam("sortType") String sortType) {
         try {
-            PageDto result = departmentManager.getAcademicYear(searchKey, page, limit, sortBy, sortType);
+            PageDto result = departmentManager.getDepartment(searchKey, page, limit, sortBy, sortType);
             if (result != null) {
                 return responseUtils.getResponseEntity(result, 1, "Get Successfully", HttpStatus.OK);
             }

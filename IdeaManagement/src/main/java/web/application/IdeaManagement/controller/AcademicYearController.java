@@ -5,12 +5,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import web.application.IdeaManagement.dto.PageDto;
+import web.application.IdeaManagement.entity.AcademicYear;
 import web.application.IdeaManagement.manager.AcademicYearManager;
 import web.application.IdeaManagement.model.request.AcademicYearRequest;
+import web.application.IdeaManagement.model.response.AcademicYearReponse;
 import web.application.IdeaManagement.utils.JwtUtils;
 import web.application.IdeaManagement.utils.ResponseUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 
 @CrossOrigin("*")
@@ -43,6 +46,8 @@ public class AcademicYearController {
         }
     }
 
+
+
     @GetMapping("/get")
     public ResponseEntity<?> getAcademicYearWithSpec(@RequestParam(value = "searchKey",required = false) String searchKey,
                                              @RequestParam("page") Integer page,
@@ -60,4 +65,16 @@ public class AcademicYearController {
         }
     }
 
+    @GetMapping("/get-semester-by-year")
+    public ResponseEntity<?> getTemp(@RequestParam("year") String year){
+        try{
+            List<AcademicYearReponse> result = academicYearManager.getSemesterByYear(year);
+            if (result != null) {
+                return responseUtils.getResponseEntity(result, 1, "Get Successfully", HttpStatus.OK);
+            }
+            return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
+        }catch (Exception e){
+            return responseUtils.getResponseEntity(e, -1, "Login fail!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
