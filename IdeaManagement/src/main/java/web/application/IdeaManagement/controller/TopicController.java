@@ -46,12 +46,13 @@ public class TopicController {
 
     @GetMapping("/get")
     public ResponseEntity<?> getIdeaWithSpec(@RequestParam(value = "searchKey",required = false) String searchKey,
+                                             @RequestParam(value = "departmentId",required = false) Long departmentId,
                                              @RequestParam("page") Integer page,
                                              @RequestParam("limit") Integer limit,
                                              @RequestParam("sortBy") String sortBy,
                                              @RequestParam("sortType") String sortType) {
         try {
-            PageDto result = topicManager.getTopic(searchKey, page, limit, sortBy, sortType);
+            PageDto result = topicManager.getTopic(searchKey, departmentId, page, limit, sortBy, sortType);
             if (result != null) {
                 return responseUtils.getResponseEntity(result, 1, "Create Successfully", HttpStatus.OK);
             }

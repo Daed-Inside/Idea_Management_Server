@@ -73,9 +73,9 @@ public class CategoryManager {
     }
 
 
-    public PageDto getCategory(String searchKey, Integer page, Integer limit, String sortBy, String sortType) {
+    public PageDto getCategory(String searchKey, Long topicId, Integer page, Integer limit, String sortBy, String sortType) {
         try {
-            Map<String, Object> mapCategory = categorySpecification.getDataCategory(searchKey, page, limit, sortBy, sortType);
+            Map<String, Object> mapCategory = categorySpecification.getDataCategory(searchKey, topicId, page, limit, sortBy, sortType);
             List<CategoryReponse> listRes = (List<CategoryReponse>) mapCategory.get("data");
             Long totalItems = (Long) mapCategory.get("count");
             Integer totalPage = responseUtils.getPageCount(totalItems, limit);

@@ -61,9 +61,9 @@ public class TopicManager {
 //        }
 //    }
 
-    public PageDto getTopic(String searchKey, Integer page, Integer limit, String sortBy, String sortType) {
+    public PageDto getTopic(String searchKey, Long departmentId, Integer page, Integer limit, String sortBy, String sortType) {
         try {
-            Map<String, Object> mapTopic = topicSpecification.getListTopic(searchKey, page, limit, sortBy, sortType);
+            Map<String, Object> mapTopic = topicSpecification.getListTopic(searchKey, departmentId, page, limit, sortBy, sortType);
             List<TopicResponse> listRes = (List<TopicResponse>) mapTopic.get("data");
             Long totalItems = (Long) mapTopic.get("count");
             Integer totalPage = responseUtils.getPageCount(totalItems, limit);

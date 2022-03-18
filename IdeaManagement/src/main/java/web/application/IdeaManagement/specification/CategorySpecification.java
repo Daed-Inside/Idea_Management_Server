@@ -60,7 +60,7 @@ public class CategorySpecification {
 //        };
 //    }
 
-    public Map<String, Object> getDataCategory(String searchKey, Integer page, Integer limit, String sortBy, String sortType) {
+    public Map<String, Object> getDataCategory(String searchKey, Long topicId, Integer page, Integer limit, String sortBy, String sortType) {
         try {
             Map<String, Object> mapFinal = new HashMap<>();
             CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -69,6 +69,9 @@ public class CategorySpecification {
             Root<Topic> rootTopic = query.from(Topic.class);
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(cb.equal(root.get("topicId"), rootTopic.get("id")));
+            if (topicId != null) {
+                predicates.add(cb.equal(root.get("topicId"), topicId));
+            }
             if (!StringUtils.isEmpty(searchKey)) {
                 try {
                     Long parseId = Long.parseLong(searchKey);

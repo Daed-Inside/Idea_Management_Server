@@ -53,7 +53,7 @@ public class TopicSpecification {
         };
     }
 
-    public Map<String, Object> getListTopic(String searchKey, Integer page, Integer limit, String sortBy, String sortType) {
+    public Map<String, Object> getListTopic(String searchKey, Long departmentId, Integer page, Integer limit, String sortBy, String sortType) {
         try {
             Map<String, Object> mapFinal = new HashMap<>();
             CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -64,6 +64,9 @@ public class TopicSpecification {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(cb.equal(root.get("academicId"), rootAcad.get("id")));
             predicates.add(cb.equal(root.get("departmentId"), rootDept.get("id")));
+            if (departmentId != null) {
+                predicates.add(cb.equal(root.get("departmentId"), departmentId));
+            }
             if (StringUtils.isEmpty(searchKey)) {
                 predicates.add(cb.or(cb.like(cb.lower(root.get("topic")), "%" + searchKey.toLowerCase() + "%"),
                         cb.like(cb.lower(rootDept.get("department")), "%" + searchKey.toLowerCase() + "%"),
