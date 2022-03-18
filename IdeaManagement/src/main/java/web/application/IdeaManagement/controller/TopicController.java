@@ -45,7 +45,7 @@ public class TopicController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<?> getIdeaWithSpec(@RequestParam(value = "searchKey",required = false) String searchKey,
+    public ResponseEntity<?> getTopicSpec(@RequestParam(value = "searchKey",required = false) String searchKey,
                                              @RequestParam("page") Integer page,
                                              @RequestParam("limit") Integer limit,
                                              @RequestParam("sortBy") String sortBy,
