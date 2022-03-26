@@ -36,7 +36,7 @@ public class RoleController {
         try {
             String jwt = jwtUtils.getJwtFromRequest(request);
             String username = jwtUtils.getUserNameFromJwtToken(jwt);
-            Integer result = roleManager.create(reqBody,username);
+            Integer result = roleManager.create(reqBody, username);
             if (result == 1) {
                 return responseUtils.getResponseEntity(null, 1, "Create Successfully", HttpStatus.OK);
             } else if (result == -2) {
@@ -48,12 +48,12 @@ public class RoleController {
         }
     }
 
-    @GetMapping("/get")
+    @GetMapping("/get/role")
     public ResponseEntity<?> getRole(@RequestParam(value = "searchKey", required = false) String searchKey,
-                                                 @RequestParam("page") Integer page,
-                                                 @RequestParam("limit") Integer limit,
-                                                 @RequestParam("sortBy") String sortBy,
-                                                 @RequestParam("sortType") String sortType) {
+                                     @RequestParam("page") Integer page,
+                                     @RequestParam("limit") Integer limit,
+                                     @RequestParam("sortBy") String sortBy,
+                                     @RequestParam("sortType") String sortType) {
         try {
             PageDto result = roleManager.getRole(searchKey, page, limit, sortBy, sortType);
             if (result != null) {
@@ -65,7 +65,7 @@ public class RoleController {
         }
     }
 
-    @GetMapping("/get")
+    @GetMapping("/get/permission")
     public ResponseEntity<?> getPermission() {
         try {
             List<PermissionResponse> result = permissionManager.getPermission();
@@ -73,6 +73,18 @@ public class RoleController {
                 return responseUtils.getResponseEntity(result, 1, "Get Successfully", HttpStatus.OK);
             }
             return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
+        } catch (Exception e) {
+            return responseUtils.getResponseEntity(e, -1, "Login fail!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/check/permission")
+    public ResponseEntity<?> getPermission(HttpServletRequest request, @RequestParam("screen") String screen) {
+        try {
+            String jwt = jwtUtils.getJwtFromRequest(request);
+            String userId = jwtUtils.getUserIdFromJwtToken(jwt);
+            Boolean result = permissionManager.checkPermission(userId, screen);
+            return responseUtils.getResponseEntity(result, 1, "Get Successfully", HttpStatus.OK);
         } catch (Exception e) {
             return responseUtils.getResponseEntity(e, -1, "Login fail!", HttpStatus.INTERNAL_SERVER_ERROR);
         }

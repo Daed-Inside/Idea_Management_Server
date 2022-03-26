@@ -7,6 +7,7 @@ import java.util.Set;
 @Data
 public class SignupRequest {
     private Long id;
+    private String userId;
     private Long departmentId;
     private String username;
     private String firstname;

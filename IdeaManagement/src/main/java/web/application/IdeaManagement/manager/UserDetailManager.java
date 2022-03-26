@@ -28,6 +28,26 @@ public class UserDetailManager implements UserDetails {
 
     private String jwt;
 
+    private String departmentName;
+
+    private Long departmentId;
+
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
+    }
+
+    public Long getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(Long departmentId) {
+        this.departmentId = departmentId;
+    }
+
     public String getJwt() {
         return jwt;
     }

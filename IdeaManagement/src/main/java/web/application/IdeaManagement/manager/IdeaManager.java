@@ -169,4 +169,13 @@ public class IdeaManager {
             return null;
         }
     }
+
+    public void getIdeaDetail(Long id) {
+        try {
+            Idea specIdea = ideaRepository.findById(id).get();
+            List<IdeaAttachment> listAttach = ideaAttachmentRepo.findByIdeaId(id);
+        } catch (Exception e) {
+
+        }
+    }
 }

@@ -29,4 +29,20 @@ public class PermissionManager {
         List<Permission> listPermission = permissionRepository.findAll();
         return listPermission.stream().map(x -> modelMapper.map(x, PermissionResponse.class)).collect(Collectors.toList());
     }
+
+    public Boolean checkPermission(String userId, String screen) {
+        try {
+            List<String> listPermission = permissionRepository.listPermission(userId);
+            if (!listPermission.isEmpty()) {
+                if (listPermission.contains(screen)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

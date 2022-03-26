@@ -8,7 +8,7 @@ import javax.persistence.Table;
 
 @Entity
 @Data
-@Table(name = "permission")
+@Table(name = "role_permission")
 public class RolePermission extends BaseEntity {
     @Column(name = "role_id")
     private Long roleId;

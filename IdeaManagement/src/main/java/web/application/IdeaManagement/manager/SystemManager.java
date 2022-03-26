@@ -6,8 +6,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import web.application.IdeaManagement.entity.Department;
 import web.application.IdeaManagement.entity.User;
 import web.application.IdeaManagement.model.request.LoginRequest;
+import web.application.IdeaManagement.repository.DepartmentRepository;
 import web.application.IdeaManagement.repository.UserRepository;
 import web.application.IdeaManagement.utils.JwtUtils;
 
@@ -19,6 +21,8 @@ public class SystemManager {
     JwtUtils jwtUtils;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    DepartmentRepository departmentRepository;
 
     public UserDetailManager login(LoginRequest request) {
         try {
@@ -30,6 +34,7 @@ public class SystemManager {
                 return userDetails;
             } else {
                 try {
+                    Department dept = departmentRepository.findById(existUser.getDepartmentId()).get();
                     Authentication authentication = authenticationManager.authenticate(
                             new UsernamePasswordAuthenticationToken(username, request.getPassword()));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -39,6 +44,8 @@ public class SystemManager {
                     userDetails.setResponseMessage("success");
                     userDetails.setFirstname(existUser.getFirstname());
                     userDetails.setLastname(existUser.getLastname());
+                    userDetails.setDepartmentId(dept.getId());
+                    userDetails.setDepartmentName(dept.getDepartment());
                     return userDetails;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -52,4 +59,6 @@ public class SystemManager {
             return null;
         }
     }
+
+
 }

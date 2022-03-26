@@ -1,6 +1,8 @@
 package web.application.IdeaManagement.controller;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -11,8 +13,10 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import web.application.IdeaManagement.manager.CSVManager;
 import web.application.IdeaManagement.utils.FileUtils;
 
+import javax.servlet.http.HttpServletResponse;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 
@@ -21,6 +25,9 @@ import java.nio.file.Path;
 @CrossOrigin("*")
 @RequestMapping("/file")
 public class FileController {
+    @Autowired
+    private CSVManager csvManager;
+
     @GetMapping("/download/{type}/{fileName:.+}")
     public ResponseEntity downloadFileFromDevice(@PathVariable String type,
                                                  @PathVariable String fileName) {
@@ -35,6 +42,17 @@ public class FileController {
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "contract; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
+    }
+
+    @GetMapping("/file/test")
+    public void downloadTest(HttpServletResponse response) {
+        response.setContentType("text/csv");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; file=customers.csv");
+        try {
+            csvManager.writeObjectToCSV(response.getWriter());
+        } catch (Exception e) {
+
+        }
     }
 
 }

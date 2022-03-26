@@ -86,9 +86,8 @@ public class AuthenController {
 
             // Create new user's account
             String userId = UUID.randomUUID().toString();
-            String username = signUpRequest.getEmail().substring(0, signUpRequest.getEmail().indexOf("@"));
-            User user = new User(username, signUpRequest.getEmail(),
-                    encoder.encode(signUpRequest.getPassword()));
+//            String username = signUpRequest.getEmail().substring(0, signUpRequest.getEmail().indexOf("@"));
+            User user = modelMapper.map(signUpRequest, User.class);
 
             Set<Long> strRoles = signUpRequest.getRole();
             Set<Role> roles = new HashSet<>();
@@ -100,12 +99,8 @@ public class AuthenController {
             } else {
             }
             String generatedString = RandomStringUtils.random(10, true, true);
-            user.setUsername(username);
-            user.setAddress(signUpRequest.getAddress());
-            user.setPhone(signUpRequest.getPhone());
-            user.setDepartmentId(signUpRequest.getDepartmentId());
-            user.setFirstname(signUpRequest.getFirstname());
-            user.setLastname(signUpRequest.getLastname());
+            user.setUsername(signUpRequest.getEmail());
+            user.setPassword(encoder.encode(signUpRequest.getPassword()));
             user.setRoles(roles);
             user.setUserId(userId);
             user.setCreateDate(new Date());
