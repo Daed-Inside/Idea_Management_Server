@@ -62,6 +62,9 @@ public class AuthenController {
                 List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
                         .collect(Collectors.toList());
                 UserInfoResponse userInfo = modelMapper.map(userDetails, UserInfoResponse.class);
+                if (!roles.isEmpty()) {
+                    userInfo.setRole(roles.get(0));
+                }
                 return responseUtils.getResponseEntity(
                         new JwtResponse(userDetails.getJwt(), userInfo, roles),1,"Login success!", HttpStatus.OK);
             }
@@ -89,18 +92,14 @@ public class AuthenController {
 //            String username = signUpRequest.getEmail().substring(0, signUpRequest.getEmail().indexOf("@"));
             User user = modelMapper.map(signUpRequest, User.class);
 
-            Set<Long> strRoles = signUpRequest.getRole();
-            Set<Role> roles = new HashSet<>();
-
-            if (strRoles == null) {
-                Role userRole = roleDao.findByName("USER");
-
-                roles.add(userRole);
-            } else {
-            }
+//            Set<Long> strRoles = signUpRequest.getRole();
+//            String randomPass = RandomStringUtils.random(10, true, true);
+            String randomPass = "1234";
+            Long roleId = signUpRequest.getRoleId();
+            Set<Role> roles = systemManager.getSignUpRole(roleId);
             String generatedString = RandomStringUtils.random(10, true, true);
             user.setUsername(signUpRequest.getEmail());
-            user.setPassword(encoder.encode(signUpRequest.getPassword()));
+            user.setPassword(encoder.encode(randomPass));
             user.setRoles(roles);
             user.setUserId(userId);
             user.setCreateDate(new Date());
@@ -111,6 +110,16 @@ public class AuthenController {
             return responseUtils.getResponseEntity(null, 1, "Success", HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
+            return responseUtils.getResponseEntity(null, -1, "Fail", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/get/roles")
+    public ResponseEntity<?> registerUser(@RequestParam(value = "search", required = false) String search) {
+        try {
+            List<Map<String, Object>> listReturn = systemManager.getRole();
+            return responseUtils.getResponseEntity(listReturn, 1, "SUCCESS", HttpStatus.OK);
+        } catch (Exception e) {
             return responseUtils.getResponseEntity(null, -1, "Fail", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

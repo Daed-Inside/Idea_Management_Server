@@ -16,4 +16,5 @@ public class UserInfoResponse {
     private String email;
     private String departmentName;
     private Long departmentId;
+    private String role;
 }

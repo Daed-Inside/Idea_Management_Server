@@ -49,10 +49,12 @@ public class UserManager {
 
                 listFinal = listUser.getContent().stream().map(x -> {
                     UserResponse newRes = new UserResponse();
-                    newRes.setAddress(x.getUserId());
+                    newRes.setAddress(x.getAddress());
+                    newRes.setPhone(x.getPhone());
                     newRes.setEmail(x.getEmail());
                     newRes.setFirstname(x.getFirstname());
                     newRes.setLastname(x.getLastname());
+                    newRes.setUserId(x.getUserId());
                     String roles = x.getRoles().isEmpty() ? null : x.getRoles().stream().map(role -> role.getName()).collect(Collectors.toList()).get(0);
                     newRes.setRole(roles);
                     newRes.setDepartment(mapDeptName.get(x.getDepartmentId()));
@@ -68,6 +70,7 @@ public class UserManager {
                     .totalElements(listUser.getTotalElements())
                     .build();
         } catch (Exception e) {
+            e.printStackTrace();
             return new PageDto();
         }
     }

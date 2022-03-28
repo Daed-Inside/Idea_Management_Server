@@ -20,4 +20,5 @@ public class SignupRequest {
     private String fullname;
     private String address;
     private Set<Long> role;
+    private Long roleId;
 }
