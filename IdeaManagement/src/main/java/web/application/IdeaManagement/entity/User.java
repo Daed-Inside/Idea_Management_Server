@@ -31,6 +31,9 @@ public class User{
 	@Column(name = "lastname", length = 50, nullable = false)
 	private String lastname;
 
+	@Column(name = "sex", length = 15, nullable = false)
+	private String sex;
+
 	@Column(name = "age")
 	private Long age;
 

@@ -20,6 +20,7 @@ import web.application.IdeaManagement.specification.UserSpecification;
 import web.application.IdeaManagement.utils.ResponseUtils;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,11 +46,12 @@ public class UserManager {
             if (!listUser.getContent().isEmpty()) {
                 List<Long> listUID = listUser.getContent().stream().map(user -> user.getDepartmentId()).collect(Collectors.toList());
                 List<Department> listDept = departmentRepository.findAllById(listUID);
-                Map<Long, String> mapDeptName = listDept.stream().collect(Collectors.toMap(Department::getId, Department::getDepartment));
+                Map<Long, Department> mapDeptName = listDept.stream().collect(Collectors.toMap(Department::getId, Function.identity()));
 
                 listFinal = listUser.getContent().stream().map(x -> {
                     UserResponse newRes = new UserResponse();
                     newRes.setAddress(x.getAddress());
+                    newRes.setSex(x.getSex());
                     newRes.setPhone(x.getPhone());
                     newRes.setEmail(x.getEmail());
                     newRes.setFirstname(x.getFirstname());
@@ -57,7 +59,8 @@ public class UserManager {
                     newRes.setUserId(x.getUserId());
                     String roles = x.getRoles().isEmpty() ? null : x.getRoles().stream().map(role -> role.getName()).collect(Collectors.toList()).get(0);
                     newRes.setRole(roles);
-                    newRes.setDepartment(mapDeptName.get(x.getDepartmentId()));
+                    newRes.setDepartment(mapDeptName.get(x.getDepartmentId()).getDepartment());
+                    newRes.setDepartmentId(mapDeptName.get(x.getDepartmentId()).getId());
                     return newRes;
                 }).collect(Collectors.toList());
             }

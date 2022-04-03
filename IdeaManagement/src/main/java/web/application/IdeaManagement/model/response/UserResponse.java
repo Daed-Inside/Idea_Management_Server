@@ -12,4 +12,7 @@ public class UserResponse {
     private String phone;
     private String role;
     private String department;
+    private Long departmentId;
+    private Long roleId;
+    private String sex;
 }

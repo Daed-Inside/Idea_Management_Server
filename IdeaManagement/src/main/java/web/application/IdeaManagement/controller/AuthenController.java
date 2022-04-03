@@ -100,6 +100,7 @@ public class AuthenController {
             String generatedString = RandomStringUtils.random(10, true, true);
             user.setUsername(signUpRequest.getEmail());
             user.setPassword(encoder.encode(randomPass));
+            user.setSex(signUpRequest.getSex());
             user.setRoles(roles);
             user.setUserId(userId);
             user.setCreateDate(new Date());
