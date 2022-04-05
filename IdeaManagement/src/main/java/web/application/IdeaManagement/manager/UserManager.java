@@ -33,6 +33,8 @@ public class UserManager {
     @Autowired
     UserRepository userRepository;
     @Autowired
+    RoleRepository roleRepository;
+    @Autowired
     DepartmentRepository departmentRepository;
     @Autowired
     UserSpecification userSpecification;
@@ -59,6 +61,8 @@ public class UserManager {
                     newRes.setUserId(x.getUserId());
                     String roles = x.getRoles().isEmpty() ? null : x.getRoles().stream().map(role -> role.getName()).collect(Collectors.toList()).get(0);
                     newRes.setRole(roles);
+                    Long roleId = x.getRoles().isEmpty() ? null : x.getRoles().stream().map(role -> role.getId()).collect(Collectors.toList()).get(0);
+                    newRes.setRoleId(roleId);
                     newRes.setDepartment(mapDeptName.get(x.getDepartmentId()).getDepartment());
                     newRes.setDepartmentId(mapDeptName.get(x.getDepartmentId()).getId());
                     return newRes;
@@ -99,7 +103,14 @@ public class UserManager {
             if (req.getSex() != null && !req.getSex().equals(editedUser.getSex())) {
                 editedUser.setSex(req.getSex());
             }
+
+            // Update role
+            Role roleDel = editedUser.getRoles().stream().findFirst().get();
+            editedUser.getRoles().remove(roleDel);
+            Role roleUpdate = roleRepository.findRoleById(req.getRoleId());
+            editedUser.getRoles().add(roleUpdate);
             userRepository.save(editedUser);
+
             return 1;
         } catch (Exception e) {
             e.printStackTrace();
