@@ -96,9 +96,13 @@ public class UserManager {
             if (req.getPhone() != null && !req.getPhone().equals(editedUser.getPhone())) {
                 editedUser.setPhone(req.getPhone());
             }
+            if (req.getSex() != null && !req.getSex().equals(editedUser.getSex())) {
+                editedUser.setSex(req.getSex());
+            }
             userRepository.save(editedUser);
             return 1;
         } catch (Exception e) {
+            e.printStackTrace();
             return 0;
         }
     }
