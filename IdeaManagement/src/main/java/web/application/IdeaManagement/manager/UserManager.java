@@ -5,18 +5,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import web.application.IdeaManagement.dto.PageDto;
 import web.application.IdeaManagement.entity.Department;
 import web.application.IdeaManagement.entity.Role;
 import web.application.IdeaManagement.entity.User;
+import web.application.IdeaManagement.model.request.ChangePassRequest;
 import web.application.IdeaManagement.model.request.SignupRequest;
 import web.application.IdeaManagement.model.response.UserResponse;
 import web.application.IdeaManagement.repository.DepartmentRepository;
 import web.application.IdeaManagement.repository.RoleRepository;
 import web.application.IdeaManagement.repository.UserRepository;
 import web.application.IdeaManagement.specification.UserSpecification;
+import web.application.IdeaManagement.utils.JwtUtils;
 import web.application.IdeaManagement.utils.ResponseUtils;
 
 import java.util.*;
@@ -38,6 +45,12 @@ public class UserManager {
     DepartmentRepository departmentRepository;
     @Autowired
     UserSpecification userSpecification;
+    @Autowired
+    AuthenticationManager authenticationManager;
+    @Autowired
+    JwtUtils jwtUtils;
+    @Autowired
+    PasswordEncoder encoder;
 
     public PageDto getUser(String search, Integer page, Integer limit, String sortBy, String sortType) {
         try {
@@ -114,6 +127,27 @@ public class UserManager {
             return 1;
         } catch (Exception e) {
             e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public Integer changePassword(ChangePassRequest request) {
+        try {
+            try {
+                Authentication authentication = authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(request.getEmail(), request.getOldPassword()));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+//                String jwt = jwtUtils.generateJwtToken(authentication);
+
+                User existUser = userRepository.findByEmail(request.getEmail());
+                existUser.setPassword(encoder.encode(request.getNewPassword()));
+                userRepository.save(existUser);
+                return 1;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return -2;
+            }
+        } catch (Exception e) {
             return 0;
         }
     }

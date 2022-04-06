@@ -37,6 +37,8 @@ public class DepartmentController {
                 return responseUtils.getResponseEntity(null, 1, "Create Successfully", HttpStatus.OK);
             } else if (result == -1) {
                 return responseUtils.getResponseEntity(null, -1, "Fail to create department", HttpStatus.OK);
+            } else if (result == -2) {
+                return responseUtils.getResponseEntity(null, -2, "Department is exist", HttpStatus.OK);
             }
             return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
         }catch (Exception e) {

@@ -8,4 +8,5 @@ import web.application.IdeaManagement.entity.Department;
 import java.util.List;
 
 public interface DepartmentRepository extends JpaRepository<Department, Long>, JpaSpecificationExecutor<Department> {
+    Boolean existsByDepartment(String department);
 }

@@ -6,10 +6,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import web.application.IdeaManagement.dto.PageDto;
 import web.application.IdeaManagement.manager.UserManager;
+import web.application.IdeaManagement.model.request.ChangePassRequest;
 import web.application.IdeaManagement.model.request.IdeaRequestModel;
 import web.application.IdeaManagement.model.request.SignupRequest;
 import web.application.IdeaManagement.utils.JwtUtils;
 import web.application.IdeaManagement.utils.ResponseUtils;
+
+import javax.servlet.http.HttpServletRequest;
 
 @CrossOrigin("*")
 @RestController
@@ -45,6 +48,24 @@ public class UserController {
             Integer result = userManager.updateUser(userId, req);
             if (result == 1) {
                 return responseUtils.getResponseEntity(null, 1, "Create Successfully", HttpStatus.OK);
+            }
+            return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
+        } catch (Exception e) {
+            return responseUtils.getResponseEntity(e, -1, "Login fail!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/change-pass")
+    public ResponseEntity<?> changePass(@RequestBody ChangePassRequest req, HttpServletRequest request) {
+        try {
+            String jwt = jwtUtils.getJwtFromRequest(request);
+            String username = jwtUtils.getUserNameFromJwtToken(jwt);
+            req.setEmail(username);
+            Integer result = userManager.changePassword(req);
+            if (result == 1) {
+                return responseUtils.getResponseEntity(null, 1, "Create Successfully", HttpStatus.OK);
+            } else if (result == -2) {
+                return responseUtils.getResponseEntity(null, -2, "Incorrect current password", HttpStatus.OK);
             }
             return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
         } catch (Exception e) {

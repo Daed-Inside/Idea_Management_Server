@@ -19,7 +19,9 @@ import web.application.IdeaManagement.specification.RoleSpecification;
 import web.application.IdeaManagement.utils.ResponseUtils;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,8 +68,14 @@ public class RoleManager {
             Integer pageNum = page - 1;
             Sort sort = responseUtils.getSort(sortBy, sortType);
             Page<Role> pageRes = roleRepository.findAll(roleSpecification.filter(search), PageRequest.of(pageNum, limit, sort));
+            List<PermissionResponse> listResponse = pageRes.getContent().stream().map(x -> {
+                PermissionResponse mapData = new PermissionResponse();
+                mapData.setId(x.getId());
+                mapData.setName(x.getName());
+                return mapData;
+            }).collect(Collectors.toList());
             return PageDto.builder()
-                    .content(pageRes.getContent())
+                    .content(listResponse)
                     .numberOfElements(page)
                     .page(page)
                     .size(limit)

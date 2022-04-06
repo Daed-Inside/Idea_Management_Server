@@ -48,7 +48,7 @@ public class RoleController {
         }
     }
 
-    @GetMapping("/get/role")
+    @GetMapping("/get")
     public ResponseEntity<?> getRole(@RequestParam(value = "searchKey", required = false) String searchKey,
                                      @RequestParam("page") Integer page,
                                      @RequestParam("limit") Integer limit,
@@ -65,7 +65,7 @@ public class RoleController {
         }
     }
 
-    @GetMapping("/get/permission")
+    @GetMapping("/permission/get")
     public ResponseEntity<?> getPermission() {
         try {
             List<PermissionResponse> result = permissionManager.getPermission();
@@ -78,7 +78,7 @@ public class RoleController {
         }
     }
 
-    @GetMapping("/check/permission")
+    @GetMapping("/permission/check")
     public ResponseEntity<?> getPermission(HttpServletRequest request, @RequestParam("screen") String screen) {
         try {
             String jwt = jwtUtils.getJwtFromRequest(request);

@@ -35,6 +35,10 @@ public class DepartmentManager {
 
     public Integer createDepartment(DepartmentRequest reqBody) {
         try{
+            Boolean exist = departmentRepository.existsByDepartment(reqBody.getDepartment());
+            if (exist) {
+                return -2;
+            }
             Department newDepartment = modelMapper.map(reqBody, Department.class);
             newDepartment.setCreatedDate(new Date());
             departmentRepository.save(newDepartment);
