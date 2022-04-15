@@ -34,7 +34,7 @@ public class IdeaCommentManager {
     @Autowired
     CommentSpecification commentSpec;
 
-    public Integer createComment(CommentRequest request, String userId) {
+    public Integer createComment(CommentRequest request, String userId, String email) {
         try {
             List<Topic> topic = topicRepository.findAll(topicSpec.filterTopicByIdea(request.getIdeaId()));
             if (!topic.isEmpty()) {
@@ -49,7 +49,7 @@ public class IdeaCommentManager {
                 ideaComment.setContent(request.getContent());
                 ideaComment.setIsAnonymous(request.getIsAnonymous());
                 ideaComment.setCreatedDate(new Date());
-                ideaComment.setCreatedUser("khiem");
+                ideaComment.setCreatedUser(email);
                 ideaCommentRepo.save(ideaComment);
             }
             return 1;

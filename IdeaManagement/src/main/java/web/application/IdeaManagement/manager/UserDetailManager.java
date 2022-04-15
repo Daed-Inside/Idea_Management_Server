@@ -32,6 +32,16 @@ public class UserDetailManager implements UserDetails {
 
     private Long departmentId;
 
+    private String avatar;
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
     public String getDepartmentName() {
         return departmentName;
     }

@@ -7,6 +7,6 @@ import web.application.IdeaManagement.entity.Role;
 public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificationExecutor<Role> {
     Role findByName(String role);
     Role findRoleById(Long id);
-    Role getRoleByName(String name);
+//    Role findByName(String name);
     Boolean existsByName(String role);
 }

@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserInfoResponse {
-    private String id;
+    private String userId;
     private String username;
     private String firstname;
     private String lastname;
@@ -17,4 +17,5 @@ public class UserInfoResponse {
     private String departmentName;
     private Long departmentId;
     private String role;
+    private String avatar;
 }

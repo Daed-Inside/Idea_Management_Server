@@ -21,4 +21,8 @@ public class SignupRequest {
     private String address;
     private Set<Long> role;
     private Long roleId;
+
+    public void setId(String id) {
+        this.id = null;
+    }
 }

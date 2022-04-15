@@ -48,14 +48,36 @@ public class RoleController {
         }
     }
 
+    @PostMapping("/update/{id}")
+    public ResponseEntity<?> edit(@RequestBody RoleRequest reqBody,
+                                            @PathVariable Long id,
+                                            HttpServletRequest request) {
+        try {
+            reqBody.setId(id);
+            String jwt = jwtUtils.getJwtFromRequest(request);
+            String username = jwtUtils.getUserNameFromJwtToken(jwt);
+            Integer result = roleManager.edit(reqBody, username);
+            if (result == 1) {
+                return responseUtils.getResponseEntity(null, 1, "Edit successfully", HttpStatus.OK);
+            } else if (result == -2) {
+                return responseUtils.getResponseEntity(null, -1, "Role name is existed, please choose another name", HttpStatus.OK);
+            }
+            return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseUtils.getResponseEntity(e, -1, "fail!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/get")
     public ResponseEntity<?> getRole(@RequestParam(value = "searchKey", required = false) String searchKey,
                                      @RequestParam("page") Integer page,
                                      @RequestParam("limit") Integer limit,
                                      @RequestParam("sortBy") String sortBy,
-                                     @RequestParam("sortType") String sortType) {
+                                     @RequestParam("sortType") String sortType,
+                                     @RequestParam(value = "selectBox", required = false) Boolean selectBox) {
         try {
-            PageDto result = roleManager.getRole(searchKey, page, limit, sortBy, sortType);
+            PageDto result = roleManager.getRole(searchKey, page, selectBox, limit, sortBy, sortType);
             if (result != null) {
                 return responseUtils.getResponseEntity(result, 1, "Get Successfully", HttpStatus.OK);
             }
@@ -78,12 +100,12 @@ public class RoleController {
         }
     }
 
-    @GetMapping("/permission/check")
-    public ResponseEntity<?> getPermission(HttpServletRequest request, @RequestParam("screen") String screen) {
+    @GetMapping("/permission/check/{flag}")
+    public ResponseEntity<?> getPermission(HttpServletRequest request, @PathVariable String flag) {
         try {
             String jwt = jwtUtils.getJwtFromRequest(request);
             String userId = jwtUtils.getUserIdFromJwtToken(jwt);
-            Boolean result = permissionManager.checkPermission(userId, screen);
+            Boolean result = permissionManager.checkPermission(userId, flag);
             return responseUtils.getResponseEntity(result, 1, "Get Successfully", HttpStatus.OK);
         } catch (Exception e) {
             return responseUtils.getResponseEntity(e, -1, "Login fail!", HttpStatus.INTERNAL_SERVER_ERROR);

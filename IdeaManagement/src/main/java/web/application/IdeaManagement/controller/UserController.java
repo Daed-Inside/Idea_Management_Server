@@ -14,6 +14,8 @@ import web.application.IdeaManagement.utils.ResponseUtils;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static web.application.IdeaManagement.constant.constant.*;
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/user")
@@ -38,7 +40,7 @@ public class UserController {
             }
             return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
         } catch (Exception e) {
-            return responseUtils.getResponseEntity(e, -1, "Login fail!", HttpStatus.INTERNAL_SERVER_ERROR);
+            return responseUtils.getResponseEntity(e, SYSTEM_ERROR_CODE, SYSTEM_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -51,7 +53,7 @@ public class UserController {
             }
             return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
         } catch (Exception e) {
-            return responseUtils.getResponseEntity(e, -1, "Login fail!", HttpStatus.INTERNAL_SERVER_ERROR);
+            return responseUtils.getResponseEntity(e, SYSTEM_ERROR_CODE, SYSTEM_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -69,7 +71,7 @@ public class UserController {
             }
             return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
         } catch (Exception e) {
-            return responseUtils.getResponseEntity(e, -1, "Login fail!", HttpStatus.INTERNAL_SERVER_ERROR);
+            return responseUtils.getResponseEntity(e, SYSTEM_ERROR_CODE, SYSTEM_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

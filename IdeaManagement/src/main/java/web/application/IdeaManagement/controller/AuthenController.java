@@ -14,9 +14,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import web.application.IdeaManagement.entity.Role;
 import web.application.IdeaManagement.entity.User;
+import web.application.IdeaManagement.manager.MailManager;
 import web.application.IdeaManagement.manager.SystemManager;
 import web.application.IdeaManagement.manager.UserDetailManager;
 import web.application.IdeaManagement.model.request.LoginRequest;
+import web.application.IdeaManagement.model.request.MailRequest;
 import web.application.IdeaManagement.model.request.SignupRequest;
 import web.application.IdeaManagement.model.response.JwtResponse;
 import web.application.IdeaManagement.model.response.UserInfoResponse;
@@ -26,6 +28,8 @@ import web.application.IdeaManagement.utils.JwtUtils;
 import web.application.IdeaManagement.utils.ResponseUtils;
 
 import java.util.stream.Collectors;
+
+import static web.application.IdeaManagement.constant.constant.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -47,6 +51,8 @@ public class AuthenController {
     SystemManager systemManager;
     @Autowired
     ModelMapper modelMapper;
+    @Autowired
+    MailManager mailManager;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
@@ -54,24 +60,25 @@ public class AuthenController {
             UserDetailManager userDetails = systemManager.login(loginRequest);
             if (userDetails != null) {
                 if (userDetails.getResponseMessage().equals("user_not_exist")) {
-                    return responseUtils.getResponseEntity(null, -1, "USER IS NOT EXIST", HttpStatus.BAD_REQUEST);
+                    return responseUtils.getResponseEntity(null, -1, "USER IS NOT EXIST", HttpStatus.OK);
                 }
                 if (userDetails.getResponseMessage().equals("wrong_password")) {
-                    return responseUtils.getResponseEntity(null, -1, "WRONG PASSWORD", HttpStatus.BAD_REQUEST);
+                    return responseUtils.getResponseEntity(null, -2, "WRONG PASSWORD", HttpStatus.OK);
                 }
                 List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
                         .collect(Collectors.toList());
                 UserInfoResponse userInfo = modelMapper.map(userDetails, UserInfoResponse.class);
+                userInfo.setUserId(userDetails.getId());
                 if (!roles.isEmpty()) {
                     userInfo.setRole(roles.get(0));
                 }
                 return responseUtils.getResponseEntity(
                         new JwtResponse(userDetails.getJwt(), userInfo, roles),1,"Login success!", HttpStatus.OK);
             }
-            return responseUtils.getResponseEntity(null, -1, "SERVER ERROR", HttpStatus.BAD_REQUEST);
+            return responseUtils.getResponseEntity(null, -1, "SERVER ERROR", HttpStatus.OK);
         }catch (Exception e) {
             e.printStackTrace();
-            return responseUtils.getResponseEntity(e, -1, "Login fail!", HttpStatus.INTERNAL_SERVER_ERROR);
+            return responseUtils.getResponseEntity(e, SYSTEM_ERROR_CODE, SYSTEM_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -108,6 +115,11 @@ public class AuthenController {
             user.setOtpCode(generatedString);
             user.setOtpExpired(DateUtils.addMinutes(new Date(), 10));
             userDao.save(user);
+            MailRequest mailReq = new MailRequest();
+            mailReq.setContent("Your account was created successfully, \n Your password is: " + randomPass);
+            mailReq.setReceiver(signUpRequest.getEmail());
+            mailReq.setSubject("New account");
+            mailManager.sendMail(mailReq);
             return responseUtils.getResponseEntity(null, 1, "Success", HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();

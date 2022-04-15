@@ -30,13 +30,13 @@ public class MailManager {
     }
 
     public Boolean sendMailWithCustomSender(String mail, String password, MailRequest request) {
-        JavaMailSender customeSender = mailSenderFactory.getSender(mail, password);
+        JavaMailSender customSender = mailSenderFactory.getSender(mail, password);
         SimpleMailMessage message = new SimpleMailMessage();
 
         message.setTo(request.getReceiver());
         message.setSubject(request.getSubject());
         message.setText(request.getContent());
-        customeSender.send(message);
+        customSender.send(message);
         return true;
     }
 }

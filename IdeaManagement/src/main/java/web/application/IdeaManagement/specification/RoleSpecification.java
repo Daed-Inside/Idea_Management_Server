@@ -13,9 +13,12 @@ import java.util.List;
 @Service
 public class RoleSpecification {
 
-    public Specification<Role> filter(String searchKey) {
+    public Specification<Role> filter(String searchKey, Boolean selectBox) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
+            if (selectBox == null || (selectBox != null && selectBox == false)) {
+                predicates.add(cb.equal(root.get("system"), 0) );
+            }
             if (!StringUtils.isEmpty(searchKey)) {
                 predicates.add(cb.like(root.get("name"), "%" + searchKey + "%"));
             }

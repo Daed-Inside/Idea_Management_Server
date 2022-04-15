@@ -56,6 +56,7 @@ public class SystemManager {
                     userDetails.setLastname(existUser.getLastname());
                     userDetails.setDepartmentId(dept.getId());
                     userDetails.setDepartmentName(dept.getDepartment());
+                    userDetails.setAvatar(existUser.getAvatar());
                     return userDetails;
                 } catch (Exception e) {
                     e.printStackTrace();

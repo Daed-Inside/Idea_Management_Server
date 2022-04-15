@@ -6,15 +6,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import web.application.IdeaManagement.dto.PageDto;
-import web.application.IdeaManagement.manager.IdeaManager;
+import web.application.IdeaManagement.entity.User;
+import web.application.IdeaManagement.manager.*;
+import web.application.IdeaManagement.model.request.CommentRequest;
+import web.application.IdeaManagement.model.request.IdeaRequest;
 import web.application.IdeaManagement.model.request.IdeaRequestModel;
+import web.application.IdeaManagement.model.request.MailRequest;
+import web.application.IdeaManagement.model.response.IdeaDetailResponse;
 import web.application.IdeaManagement.model.response.IdeaResponseModel;
+import web.application.IdeaManagement.model.response.IdeaStatusCountResponse;
 import web.application.IdeaManagement.utils.JwtUtils;
 import web.application.IdeaManagement.utils.ResponseUtils;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import static web.application.IdeaManagement.constant.constant.CLIENT_CONTEXTPATH;
 
 @CrossOrigin("*")
 @RestController
@@ -23,31 +33,44 @@ public class IdeaController {
     @Autowired
     IdeaManager ideaManager;
     @Autowired
+    UserManager userManager;
+    @Autowired
+    IdeaReactionManager ideaReactionManager;
+    @Autowired
+    IdeaCommentManager ideaCommentManager;
+    @Autowired
     ResponseUtils responseUtils;
     @Autowired
     JwtUtils jwtUtils;
+    @Autowired
+    MailManager mailManager;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createIdea(@RequestParam("departmentId") Long departmentId,
-                                        @RequestParam("categoryId") Long categoryId,
-                                        @RequestParam("topicId") Long topicId,
-                                        @RequestParam("title") String ideaTitle,
-                                        @RequestParam("description") String ideaContent,
-                                        @RequestParam("contributor") Boolean isAnonymous,
-                                        @RequestParam(value = "files", required = false) MultipartFile[] files,
+    public ResponseEntity<?> createIdea(@RequestBody IdeaRequest ideaRequest,
+//                                        @RequestParam(value = "files", required = false) MultipartFile[] files,
                                         HttpServletRequest request) {
         try {
             String jwt = jwtUtils.getJwtFromRequest(request);
             String username = jwtUtils.getUserNameFromJwtToken(jwt);
             String userId = jwtUtils.getUserIdFromJwtToken(jwt);
-            Integer result = ideaManager.createIdea(categoryId, topicId, ideaTitle, ideaContent, isAnonymous, files, username, userId);
-            if (result == 1) {
-                return responseUtils.getResponseEntity(null, 1, "Create Successfully", HttpStatus.OK);
-            } else if (result == -2) {
+            Long result = ideaManager.createIdea(ideaRequest, username, userId);
+            if (Objects.equals(result, -2l)) {
                 return responseUtils.getResponseEntity(null, -2, "The topic is closed", HttpStatus.OK);
+            } else {
+//                List<User> QAMag = userManager.getQAManager(ideaRequest.getDepartmentId());
+//                if (QAMag != null) {
+//                    for (User qa : QAMag) {
+//                        MailRequest mailReq = new MailRequest();
+//                        mailReq.setContent("Your topic have a new idea, \n Click on this link to watch this: " + CLIENT_CONTEXTPATH + "/idea-detail/" + result);
+//                        mailReq.setReceiver(qa.getEmail());
+//                        mailReq.setSubject("New Idea for topic");
+//                        mailManager.sendMail(mailReq);
+//                    }
+//                }
+                return responseUtils.getResponseEntity(null, 1, "Create Successfully", HttpStatus.OK);
             }
-            return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
             return responseUtils.getResponseEntity(e, -1, "Login fail!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -65,10 +88,30 @@ public class IdeaController {
         }
     }
 
+//    @GetMapping("/get")
+//    public ResponseEntity<?> getIdeaWithModel(@RequestParam String searchKey) {
+//        try {
+//            List<IdeaResponseModel> result = ideaManager.getIdeaWithModel(searchKey);
+//            if (result != null) {
+//                return responseUtils.getResponseEntity(result, 1, "Create Successfully", HttpStatus.OK);
+//            }
+//            return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
+//        } catch (Exception e) {
+//            return responseUtils.getResponseEntity(e, -1, "Login fail!", HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
+
     @GetMapping("/get")
-    public ResponseEntity<?> getIdeaWithModel(@RequestParam String searchKey) {
+    public ResponseEntity<?> getIdeaWithSpec(@RequestParam(value = "searchKey", required = false) String searchKey,
+                                             @RequestParam(value = "departmentId", required = false) Long deptFilter,
+                                             @RequestParam(value = "academicId", required = false) Long acadFilter,
+                                             @RequestParam(value = "topicId", required = false) Long topicId,
+                                             @RequestParam(value = "categoryId", required = false) Long CategoryId,
+                                             @RequestParam("page") Integer page,
+                                             @RequestParam("limit") Integer limit,
+                                             @RequestParam("sort") Integer sort) {
         try {
-            List<IdeaResponseModel> result = ideaManager.getIdeaWithModel(searchKey);
+            PageDto result = ideaManager.getIdeaWithSpec(searchKey, acadFilter, deptFilter, topicId, CategoryId, page, limit, sort);
             if (result != null) {
                 return responseUtils.getResponseEntity(result, 1, "Create Successfully", HttpStatus.OK);
             }
@@ -78,14 +121,61 @@ public class IdeaController {
         }
     }
 
-    @GetMapping("/get/specification")
-    public ResponseEntity<?> getIdeaWithSpec(@RequestParam(value = "searchKey", required = false) String searchKey,
-                                             @RequestParam("page") Integer page,
-                                             @RequestParam("limit") Integer limit,
-                                             @RequestParam("sortBy") String sortBy,
-                                             @RequestParam("sortType") String sortType) {
+    @GetMapping("/get/{id}")
+    public ResponseEntity<?> getIdeaWithSpec(@PathVariable Long id) {
         try {
-            PageDto result = ideaManager.getIdeaWithSpec(searchKey, page, limit, sortBy, sortType);
+            IdeaDetailResponse result = ideaManager.getIdeaDetail(id);
+            if (result != null) {
+                return responseUtils.getResponseEntity(result, 1, "Create Successfully", HttpStatus.OK);
+            }
+            return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
+        } catch (Exception e) {
+            return responseUtils.getResponseEntity(e, -1, "Login fail!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/create/comment")
+    public ResponseEntity<?> createIdea(@RequestBody CommentRequest commentRequest,
+                                        HttpServletRequest request) {
+        try {
+            String jwt = jwtUtils.getJwtFromRequest(request);
+            String username = jwtUtils.getUserNameFromJwtToken(jwt);
+            String userId = jwtUtils.getUserIdFromJwtToken(jwt);
+            Integer result = ideaCommentManager.createComment(commentRequest, username, userId);
+            if (result == 1) {
+                return responseUtils.getResponseEntity(null, 1, "Create Successfully", HttpStatus.OK);
+            } else if (result == -2) {
+                return responseUtils.getResponseEntity(null, -2, "The topic is closed", HttpStatus.OK);
+            }
+            return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
+        } catch (Exception e) {
+            return responseUtils.getResponseEntity(e, -1, "Login fail!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/reaction")
+    public ResponseEntity<?> getStatus(@RequestBody Map<String, Object> body, HttpServletRequest request) {
+        try {
+            String jwt = jwtUtils.getJwtFromRequest(request);
+            String username = jwtUtils.getUserNameFromJwtToken(jwt);
+            Long ideaId = Long.parseLong(body.get("ideaId").toString());
+            Integer evaluation = Integer.parseInt(body.get("evaluation").toString());
+            Integer result = ideaReactionManager.ReactIdea(ideaId, username, evaluation);
+            if (result == 1) {
+                return responseUtils.getResponseEntity(result, 1, "Create Successfully", HttpStatus.OK);
+            }
+            return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
+        } catch (Exception e) {
+            return responseUtils.getResponseEntity(e, -1, "Login fail!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/get/status/{id}")
+    public ResponseEntity<?> getStatus(@PathVariable Long id, HttpServletRequest request) {
+        try {
+            String jwt = jwtUtils.getJwtFromRequest(request);
+            String username = jwtUtils.getUserNameFromJwtToken(jwt);
+            IdeaStatusCountResponse result = ideaReactionManager.getIdeaStatus(id, username);
             if (result != null) {
                 return responseUtils.getResponseEntity(result, 1, "Create Successfully", HttpStatus.OK);
             }

@@ -7,4 +7,5 @@ import web.application.IdeaManagement.entity.RolePermission;
 
 @Repository
 public interface RolePermissionRepository extends JpaRepository<RolePermission, Long>, JpaSpecificationExecutor<RolePermission> {
+    void deleteByRoleId(Long roleId);
 }

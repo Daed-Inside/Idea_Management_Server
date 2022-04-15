@@ -52,6 +52,14 @@ public class UserManager {
     @Autowired
     PasswordEncoder encoder;
 
+    public List<User> getQAManager(Long deptId) {
+        try {
+            return userRepository.getQAMagByDept(deptId);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public PageDto getUser(String search, Integer page, Integer limit, String sortBy, String sortType) {
         try {
             Integer pageNum = page - 1;
@@ -116,10 +124,14 @@ public class UserManager {
             if (req.getSex() != null && !req.getSex().equals(editedUser.getSex())) {
                 editedUser.setSex(req.getSex());
             }
-
+            if (req.getAvatar() != null) {
+                editedUser.setAvatar(req.getAvatar());
+            }
             // Update role
-            Role roleDel = editedUser.getRoles().stream().findFirst().get();
-            editedUser.getRoles().remove(roleDel);
+            if (editedUser.getRoles() != null && !editedUser.getRoles().isEmpty()) {
+                Role roleDel = editedUser.getRoles().stream().findFirst().get();
+                editedUser.getRoles().remove(roleDel);
+            }
             Role roleUpdate = roleRepository.findRoleById(req.getRoleId());
             editedUser.getRoles().add(roleUpdate);
             userRepository.save(editedUser);

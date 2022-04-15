@@ -10,9 +10,6 @@ import java.util.Date;
 @Table(name = "idea_view_count")
 public class IdeaViewCount extends BaseEntity{
 
-    @Column(name = "user_id", length = 50, nullable = false)
-    private String userId;
-
     @Column(name = "idea_id", nullable = false)
     private Long ideaId;
 
