@@ -4,8 +4,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import web.application.IdeaManagement.entity.IdeaComment;
 import web.application.IdeaManagement.entity.IdeaReaction;
 import web.application.IdeaManagement.model.response.IdeaStatusCountResponse;
+import web.application.IdeaManagement.repository.IdeaCommentRepository;
 import web.application.IdeaManagement.repository.IdeaReactionRepository;
 import web.application.IdeaManagement.repository.IdeaViewCountRepository;
 import web.application.IdeaManagement.utils.ResponseUtils;
@@ -23,6 +25,8 @@ public class IdeaReactionManager {
     IdeaReactionRepository ideaReactionRepo;
     @Autowired
     IdeaViewCountRepository ideaViewCountRepo;
+    @Autowired
+    IdeaCommentRepository ideaCommentRepo;
 
     public Integer ReactIdea(Long ideaId, String email, Integer reaction) {
         try {
@@ -55,11 +59,13 @@ public class IdeaReactionManager {
             Long dislikeCount = ideaReactionRepo.countByIdeaIdAndEvaluation(ideaId, -1);
             IdeaReaction existReaction = ideaReactionRepo.findByIdeaIdAndCreatedUser(ideaId, email);
             Long viewCount = ideaViewCountRepo.countByIdeaId(ideaId);
+            Long commentCount = ideaCommentRepo.countByIdeaId(ideaId);
             IdeaStatusCountResponse newRes = new IdeaStatusCountResponse();
             newRes.setLike(likeCount);
             newRes.setDislike(dislikeCount);
             newRes.setCurrentStatus(existReaction != null ? existReaction.getEvaluation() : 0);
             newRes.setViewCount(viewCount);
+            newRes.setCommentCount(commentCount);
             return newRes;
         } catch (Exception e) {
             e.printStackTrace();

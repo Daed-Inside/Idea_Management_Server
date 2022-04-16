@@ -9,5 +9,4 @@ public class FileResponse {
     private String original;
     private String downloadUrl;
     private String fileName;
-    private Integer picture;
 }

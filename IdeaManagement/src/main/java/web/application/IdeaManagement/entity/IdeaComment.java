@@ -16,9 +16,6 @@ public class IdeaComment extends BaseEntity{
     @Column(name = "parent", nullable = true)
     private Long parent;
 
-    @Column(name = "user_id", length = 50, nullable = false)
-    private String userId;
-
     @Column(name = "idea_id", nullable = false)
     private Long ideaId;
 
@@ -28,4 +25,6 @@ public class IdeaComment extends BaseEntity{
     @Column(name = "is_anonymous", nullable = false)
     private Boolean isAnonymous;
 
+    @Column(name = "user_id", length = 150, nullable = false)
+    private String userId;
 }

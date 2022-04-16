@@ -63,7 +63,7 @@ public class AuthenController {
                     return responseUtils.getResponseEntity(null, -1, "USER IS NOT EXIST", HttpStatus.OK);
                 }
                 if (userDetails.getResponseMessage().equals("wrong_password")) {
-                    return responseUtils.getResponseEntity(null, -2, "WRONG PASSWORD", HttpStatus.OK);
+                    return responseUtils.getResponseEntity(null, -2, "WRONG CREDENTIAL", HttpStatus.OK);
                 }
                 List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
                         .collect(Collectors.toList());

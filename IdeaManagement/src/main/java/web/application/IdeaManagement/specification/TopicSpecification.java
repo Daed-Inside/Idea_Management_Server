@@ -45,11 +45,10 @@ public class TopicSpecification {
 
     public Specification<Topic> filterTopicByIdea(Long ideaId) {
         return (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
             Root<Idea> rootIdea = query.from(Idea.class);
-            cb.and(cb.equal(root.get("id"), rootIdea.get("topicId")),
+            query.distinct(true);
+            return cb.and(cb.equal(root.get("id"), rootIdea.get("topicId")),
                     cb.equal(rootIdea.get("id"), ideaId));
-            return cb.and(predicates.stream().toArray(Predicate[]::new));
         };
     }
 
@@ -97,6 +96,9 @@ public class TopicSpecification {
                     case "topic":
                         query.orderBy(cb.asc(root.get("topic")));
                         break;
+                    case "createdDate":
+                        query.orderBy(cb.asc(root.get("createdDate")));
+                        break;
                 }
             } else {
                 switch (sortBy) {
@@ -105,6 +107,9 @@ public class TopicSpecification {
                         break;
                     case "topic":
                         query.orderBy(cb.desc(root.get("topic")));
+                        break;
+                    case "createdDate":
+                        query.orderBy(cb.desc(root.get("createdDate")));
                         break;
                 }
             }

@@ -14,10 +14,7 @@ import web.application.IdeaManagement.entity.*;
 import web.application.IdeaManagement.model.request.IdeaAttachmentRequest;
 import web.application.IdeaManagement.model.request.IdeaRequest;
 import web.application.IdeaManagement.model.request.IdeaRequestModel;
-import web.application.IdeaManagement.model.response.CategoryReponse;
-import web.application.IdeaManagement.model.response.FileResponse;
-import web.application.IdeaManagement.model.response.IdeaDetailResponse;
-import web.application.IdeaManagement.model.response.IdeaResponseModel;
+import web.application.IdeaManagement.model.response.*;
 import web.application.IdeaManagement.repository.*;
 import web.application.IdeaManagement.specification.IdeaSpecification;
 import web.application.IdeaManagement.utils.LanguageUtils;
@@ -42,6 +39,8 @@ public class IdeaManager {
     IdeaRepository ideaRepository;
     @Autowired
     TopicRepository topicRepository;
+    @Autowired
+    UserRepository userRepository;
     @Autowired
     IdeaViewCountRepository ideaViewCountRepo;
     @Autowired
@@ -72,20 +71,6 @@ public class IdeaManager {
             newIdea.setCreatedUser(username);
             Idea createdIdea = ideaRepository.save(newIdea);
 
-            List<IdeaAttachment> listAttachment = new ArrayList<>();
-            if (ideaRequest.getFiles() != null) {
-                for (IdeaAttachmentRequest attach : ideaRequest.getFiles()) {
-                    IdeaAttachment ida = new IdeaAttachment();
-                    ida.setIdeaId(createdIdea.getId());
-                    ida.setUserId(userId);
-                    ida.setDownloadUrl(attach.getDownloadUrl());
-                    ida.setFileName(attach.getFileName());
-                    ida.setPath(attach.getFilePath());
-                    ida.setCreatedDate(new Date());
-                    ida.setCreatedUser(username);
-                    listAttachment.add(ida);
-                }
-            }
             //-----------add system view---------------//
             IdeaViewCount newCount = new IdeaViewCount();
             newCount.setIdeaId(createdIdea.getId());
@@ -93,18 +78,12 @@ public class IdeaManager {
             newCount.setCreatedUser("SYSTEM");
             newCount.setCreatedDate(new Date());
             //------------Add reaction count-------//
-            IdeaReaction likeReaction = new IdeaReaction();
-            IdeaReaction dislikeReaction = new IdeaReaction();
+            IdeaReaction newReaction = new IdeaReaction();
 
-            likeReaction.setCreatedDate(new Date());
-            likeReaction.setCreatedUser("SYSTEM");
-            likeReaction.setIdeaId(createdIdea.getId());
-            likeReaction.setEvaluation(1);
-
-            dislikeReaction.setCreatedDate(new Date());
-            dislikeReaction.setCreatedUser("SYSTEM");
-            dislikeReaction.setIdeaId(createdIdea.getId());
-            dislikeReaction.setEvaluation(-1);
+            newReaction.setCreatedDate(new Date());
+            newReaction.setCreatedUser("SYSTEM");
+            newReaction.setIdeaId(createdIdea.getId());
+            newReaction.setEvaluation(0);
             //---------------------------------------//
 //            DateFormat dateFormat = new SimpleDateFormat("MM_dd_yyyy_HH_mm_ss");
 //            String strDate = dateFormat.format(new Date());
@@ -151,14 +130,35 @@ public class IdeaManager {
 //                    listAttachment.add(ida);
 //                }
 //            }
-            ideaReactionRepo.save(likeReaction);
-            ideaReactionRepo.save(dislikeReaction);
+            ideaReactionRepo.save(newReaction);
             ideaViewCountRepo.save(newCount);
-            ideaAttachmentRepo.saveAll(listAttachment);
             return createdIdea.getId();
         } catch (Exception e) {
             e.printStackTrace();
             return -1l;
+        }
+    }
+
+    public Long updateFile(List<IdeaAttachmentRequest> files, Long id, String email) {
+        try {
+            List<IdeaAttachment> listSave = new ArrayList<>();
+            if (files != null) {
+                for (IdeaAttachmentRequest file : files) {
+                    IdeaAttachment ida = new IdeaAttachment();
+                    ida.setIdeaId(id);
+                    ida.setDownloadUrl(file.getDownloadUrl());
+                    ida.setFileName(file.getFileName());
+                    ida.setFileType(file.getFileType());
+                    ida.setPath(file.getFilePath());
+                    ida.setCreatedDate(new Date());
+                    ida.setCreatedUser(email);
+                    listSave.add(ida);
+                }
+            }
+            ideaAttachmentRepo.saveAll(listSave);
+            return 1l;
+        } catch (Exception e) {
+            return 0l;
         }
     }
 
@@ -218,22 +218,91 @@ public class IdeaManager {
         }
     }
 
-    public IdeaDetailResponse getIdeaDetail(Long id) {
+    public IdeaDetailResponse getIdeaDetail(Long id, String userId) {
         try {
+            User currUser = userRepository.findById(userId).get();
+            List<Role> roles = new ArrayList<>(currUser.getRoles());
+            Boolean checkAdmin = false;
+            if (!roles.isEmpty() && roles.get(0).getId() == 1l) {
+                checkAdmin = true;
+            }
             IdeaDetailResponse specIdea = ideaRepository.getIdeaDetail(id);
             List<IdeaAttachment> listAttach = ideaAttachmentRepo.findByIdeaId(id);
             List<FileResponse> fileResponses = listAttach.stream().map(x -> {
                 FileResponse newFileRes = new FileResponse();
-                newFileRes.setOriginal(x.getPath());
-                newFileRes.setThumbnail(x.getPath());
+                newFileRes.setOriginal(x.getDownloadUrl());
+                newFileRes.setThumbnail(x.getDownloadUrl());
                 newFileRes.setDownloadUrl(x.getDownloadUrl());
                 newFileRes.setFileName(x.getFileName());
+                newFileRes.setFileType(x.getFileType());
                 return newFileRes;
             }).collect(Collectors.toList());
             specIdea.setListAttachment(fileResponses);
+            if (checkAdmin == false) {
+                if (specIdea.getIsAnonymous() == true) {
+                    specIdea.setCreatedUser(null);
+                }
+            }
             return specIdea;
         } catch (Exception e) {
             return new IdeaDetailResponse();
+        }
+    }
+
+    public List<ExcelExportResponse> getExportData(String year, String semester, Long department, Long topic) {
+        try {
+            return ideaRepository.getExcelData(year, semester, department, topic);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public DashboardResponse getDashboard(String year, String semester, Long department, Long topic) {
+        try {
+            DashboardResponse response = ideaRepository.getDashboard(year, semester, department, topic);
+            Long ideaNoCmt = ideaSpecification.ideaWithNoComment(year, semester, department, topic);
+            Long anonymousCmt = ideaSpecification.anonymousComment(year, semester, department, topic);
+            response.setAnonymousComment(anonymousCmt);
+            response.setIdeaNoComment(ideaNoCmt);
+
+            //-------------------Bar chart------------------------//
+            List<String> listDept = new ArrayList<>();
+            List<Long> listIdea = new ArrayList<>();
+            List<Long> listComment = new ArrayList<>();
+            List<Object[]> bar1 = ideaRepository.FirstBarChart(year, semester, department, topic);
+            for (Object[] obj : bar1) {
+                listDept.add(obj[0].toString());
+                listIdea.add(Long.parseLong(obj[1].toString()));
+                listComment.add(Long.parseLong(obj[2].toString()));
+            }
+            FirstBarChartResponse newbar1 = new FirstBarChartResponse(listDept, listIdea, listComment);
+            //--------------------Pie Chart-----------------------//
+            List<String> listDeptPie = new ArrayList<>();
+            List<Double> listPerc = new ArrayList<>();
+            List<Object[]> pie = ideaRepository.FirstBarChart(year, semester, department, topic);
+            for (Object[] obj : pie) {
+                Long ideaCount = Long.parseLong(obj[1].toString());
+                Double percentage = ((double) Math.round(((ideaCount*1.0) /response.getTotalIdea()) * 100) / 100) * 100;
+                listDeptPie.add(obj[0].toString());
+                listPerc.add(percentage);
+            }
+            PieChartResponse newPie = new PieChartResponse(listDeptPie, listPerc);
+            //--------------------Second bar chart------------------//
+            List<String> listDept2 = new ArrayList<>();
+            List<Long> listUser = new ArrayList<>();
+            List<Object[]> bar2 = userRepository.countUserByDept();
+            for (Object[] obj : bar2) {
+                listDept2.add(obj[0].toString());
+                listUser.add(Long.parseLong(obj[1].toString()));
+            }
+            SecondBarChartResponse newBar2 = new SecondBarChartResponse(listDept2, listUser);
+            response.setFirstBarChart(newbar1);
+            response.setPieChart(newPie);
+            response.setSecondBarChar(newBar2);
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

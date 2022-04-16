@@ -7,4 +7,5 @@ public class IdeaAttachmentRequest {
     private String fileName;
     private String downloadUrl;
     private String filePath;
+    private String fileType;
 }

@@ -10,14 +10,14 @@ import java.util.Date;
 @Table(name = "idea_attachment")
 public class IdeaAttachment extends BaseEntity{
 
-    @Column(name = "user_id", length = 50, nullable = false)
-    private String userId;
-
     @Column(name = "idea_id", nullable = false)
     private Long ideaId;
 
     @Column(name = "file_name", length = 100, nullable = false)
     private String fileName;
+
+    @Column(name = "file_type", length = 250, nullable = false)
+    private String fileType;
 
     @Column(name = "path", length = 250, nullable = false)
     private String path;

@@ -4,14 +4,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.StringUtils;
 import web.application.IdeaManagement.entity.*;
+import web.application.IdeaManagement.model.response.DashboardResponse;
 import web.application.IdeaManagement.model.response.IdeaResponseModel;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -117,12 +115,13 @@ public class IdeaSpecification {
                     root.get("createdDate"),
                     root.get("createdUser")
             ).where(cb.and(predicates.stream().toArray(Predicate[]::new)));
-            List<IdeaResponseModel> listResult = entityManager.createQuery(query) != null ? entityManager.createQuery(query).getResultList() : new ArrayList<>();
+            List<IdeaResponseModel> listResult = entityManager.createQuery(query) != null ?
+                    entityManager.createQuery(query).setFirstResult((page - 1) * limit)
+                            .setMaxResults(limit).getResultList() : new ArrayList<>();
             countQuery.select(cb.count(rootCount)).where(cb.and(predCount.stream().toArray(Predicate[]::new)));
             Long count = entityManager.createQuery(countQuery).getSingleResult();
             mapFinal.put("data", listResult);
             mapFinal.put("count", count);
-            entityManager.close();
             return mapFinal;
         } catch (Exception e) {
             return new HashMap<>();
@@ -139,4 +138,82 @@ public class IdeaSpecification {
         };
     }
 
+    public Long ideaWithNoComment(String year, String semester, Long department, Long topic) {
+        try {
+            Map<String, Object> mapFinal = new HashMap<>();
+            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+            List<Predicate> predicates = new ArrayList<>();
+            CriteriaQuery<Long> query = cb.createQuery(Long.class);
+            Root<Idea> root = query.from(Idea.class);
+            Root<Topic> rootTopic = query.from(Topic.class);
+            Root<Department> rootDept = query.from(Department.class);
+            Root<AcademicYear> rootAcademic = query.from(AcademicYear.class);
+
+            predicates.add(cb.equal(root.get("topicId"), rootTopic.get("id")));
+            predicates.add(cb.equal(rootTopic.get("departmentId"), rootDept.get("id")));
+            predicates.add(cb.equal(rootTopic.get("academicId"), rootAcademic.get("id")));
+
+            if (year != null) {
+                predicates.add(cb.equal(rootAcademic.get("year"), year));
+            }
+            if (year != null) {
+                predicates.add(cb.equal(rootAcademic.get("semester"), semester));
+            }
+            if (year != null) {
+                predicates.add(cb.equal(rootTopic.get("id"), topic));
+            }
+            if (year != null) {
+                predicates.add(cb.equal(rootDept.get("id"), department));
+            }
+
+            Subquery<Long> subq = query.subquery(Long.class);
+            subq.distinct(true);
+            Root<IdeaComment> rootSuq = subq.from(IdeaComment.class);
+            Predicate subPred = cb.notEqual(rootSuq.get("createdUser"), "SYSTEM");
+            predicates.add(cb.not(root.get("id").in(subq.select(rootSuq.get("ideaId")).where(subPred))));
+            query.select(cb.countDistinct(root.get("id"))).where(cb.and(predicates.stream().toArray(Predicate[]::new)));
+            Long result = entityManager.createQuery(query).getSingleResult();
+            return result;
+        } catch (Exception e) {
+            return 0l;
+        }
+    }
+
+    public Long anonymousComment(String year, String semester, Long department, Long topic) {
+        try {
+            Map<String, Object> mapFinal = new HashMap<>();
+            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+            List<Predicate> predicates = new ArrayList<>();
+            CriteriaQuery<Long> query = cb.createQuery(Long.class);
+            Root<IdeaComment> root = query.from(IdeaComment.class);
+            Root<Idea> rootIdea = query.from(Idea.class);
+            Root<Topic> rootTopic = query.from(Topic.class);
+            Root<Department> rootDept = query.from(Department.class);
+            Root<AcademicYear> rootAcademic = query.from(AcademicYear.class);
+
+            predicates.add(cb.equal(root.get("ideaId"), rootIdea.get("id")));
+            predicates.add(cb.equal(root.get("topicId"), rootTopic.get("id")));
+            predicates.add(cb.equal(rootTopic.get("departmentId"), rootDept.get("id")));
+            predicates.add(cb.equal(rootTopic.get("academicId"), rootAcademic.get("id")));
+
+            if (year != null) {
+                predicates.add(cb.equal(rootAcademic.get("year"), year));
+            }
+            if (year != null) {
+                predicates.add(cb.equal(rootAcademic.get("semester"), semester));
+            }
+            if (year != null) {
+                predicates.add(cb.equal(rootTopic.get("id"), topic));
+            }
+            if (year != null) {
+                predicates.add(cb.equal(rootDept.get("id"), department));
+            }
+
+            query.select(cb.countDistinct(root.get("id"))).where(cb.and(predicates.stream().toArray(Predicate[]::new)));
+            Long result = entityManager.createQuery(query).getSingleResult();
+            return result;
+        } catch (Exception e) {
+            return 0l;
+        }
+    }
 }

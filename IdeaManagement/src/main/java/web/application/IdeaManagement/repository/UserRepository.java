@@ -22,4 +22,11 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
     "JOIN u.roles rol \n" +
     "Where u.departmentId = :id AND rol.id = 2l")
     List<User> getQAMagByDept(@Param("id") Long id);
+
+    @Query("SELECT dept.department, COUNT(u.id) \n" +
+    "FROM User u \n" +
+    "JOIN Department dept ON dept.id = u.departmentId \n" +
+    "GROUP BY dept.id ")
+    List<Object[]> countUserByDept();
+
 }

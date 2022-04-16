@@ -13,7 +13,7 @@ public class Role extends BaseEntity{
     @Column(name = "name",length = 50)
     private String name;
 
-    @Column(name = "system",length = 50)
+    @Column(name = "is_system",length = 50)
     private Integer system;
 
     @JsonIgnore
@@ -36,5 +36,11 @@ public class Role extends BaseEntity{
         this.users = users;
     }
 
+    public Integer getSystem() {
+        return system;
+    }
 
+    public void setSystem(Integer system) {
+        this.system = system;
+    }
 }

@@ -9,16 +9,16 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import web.application.IdeaManagement.manager.CSVManager;
+import web.application.IdeaManagement.manager.IdeaManager;
+import web.application.IdeaManagement.model.response.ExcelExportResponse;
 import web.application.IdeaManagement.utils.FileUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -27,6 +27,8 @@ import java.nio.file.Path;
 public class FileController {
     @Autowired
     private CSVManager csvManager;
+    @Autowired
+    private IdeaManager ideaManager;
 
     @GetMapping("/download/{type}/{fileName:.+}")
     public ResponseEntity downloadFileFromDevice(@PathVariable String type,
@@ -44,12 +46,17 @@ public class FileController {
                 .body(resource);
     }
 
-    @GetMapping("/file/test")
-    public void downloadTest(HttpServletResponse response) {
+    @GetMapping("/report")
+    public void downloadTest(@RequestParam("year") String year,
+                             @RequestParam(value = "semester", required = false) String semester,
+                             @RequestParam(value = "department", required = false) Long department,
+                             @RequestParam(value = "topic", required = false) Long topic,
+                             HttpServletResponse response) {
         response.setContentType("text/csv");
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; file=customers.csv");
         try {
-            csvManager.writeObjectToCSV(response.getWriter());
+            List<ExcelExportResponse> listData = ideaManager.getExportData(year, semester, department, topic);
+            csvManager.writeObjectToCSV(response.getWriter(), listData);
         } catch (Exception e) {
 
         }

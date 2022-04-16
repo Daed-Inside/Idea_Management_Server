@@ -42,18 +42,18 @@ public class CategoryController {
         }
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteCategory(@RequestParam("categoryId") Long categoryId, HttpServletRequest request) {
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteCategory(@PathVariable Long id, HttpServletRequest request) {
         try {
             String jwt = jwtUtils.getJwtFromRequest(request);
             String username = jwtUtils.getUserNameFromJwtToken(jwt);
-            Integer result = categoryManager.deleteCategory(categoryId, username);
+            Integer result = categoryManager.deleteCategory(id, username);
             if (result == 1) {
                 return responseUtils.getResponseEntity(null, 1, "Delete category Successfully", HttpStatus.OK);
             } else if (result == -1) {
                 return responseUtils.getResponseEntity(null, -1, "Category is being used", HttpStatus.OK);
             } else if (result == -2) {
-                return responseUtils.getResponseEntity(null, -1, "Category does not exist", HttpStatus.OK);
+                return responseUtils.getResponseEntity(null, -2, "Category does not exist", HttpStatus.OK);
             }
             return responseUtils.getResponseEntity(null, -1, "Failed", HttpStatus.OK);
         } catch (Exception e) {
