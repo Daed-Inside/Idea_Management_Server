@@ -156,13 +156,13 @@ public class IdeaSpecification {
             if (year != null) {
                 predicates.add(cb.equal(rootAcademic.get("year"), year));
             }
-            if (year != null) {
+            if (semester != null) {
                 predicates.add(cb.equal(rootAcademic.get("semester"), semester));
             }
-            if (year != null) {
+            if (topic != null) {
                 predicates.add(cb.equal(rootTopic.get("id"), topic));
             }
-            if (year != null) {
+            if (department != null) {
                 predicates.add(cb.equal(rootDept.get("id"), department));
             }
 
@@ -191,21 +191,22 @@ public class IdeaSpecification {
             Root<Department> rootDept = query.from(Department.class);
             Root<AcademicYear> rootAcademic = query.from(AcademicYear.class);
 
+            predicates.add(cb.isTrue(root.get("isAnonymous")));
             predicates.add(cb.equal(root.get("ideaId"), rootIdea.get("id")));
-            predicates.add(cb.equal(root.get("topicId"), rootTopic.get("id")));
+            predicates.add(cb.equal(rootIdea.get("topicId"), rootTopic.get("id")));
             predicates.add(cb.equal(rootTopic.get("departmentId"), rootDept.get("id")));
             predicates.add(cb.equal(rootTopic.get("academicId"), rootAcademic.get("id")));
 
             if (year != null) {
                 predicates.add(cb.equal(rootAcademic.get("year"), year));
             }
-            if (year != null) {
+            if (semester != null) {
                 predicates.add(cb.equal(rootAcademic.get("semester"), semester));
             }
-            if (year != null) {
+            if (topic != null) {
                 predicates.add(cb.equal(rootTopic.get("id"), topic));
             }
-            if (year != null) {
+            if (department != null) {
                 predicates.add(cb.equal(rootDept.get("id"), department));
             }
 

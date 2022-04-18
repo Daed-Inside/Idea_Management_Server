@@ -12,6 +12,8 @@ import java.util.List;
 
 @Repository
 public interface PermissionRepository extends JpaRepository<Permission, Long>, JpaSpecificationExecutor<Permission> {
+    List<Permission> findByFlagIn(List<String> flags);
+    void deleteByFlagIn(List<String> flags);
     @Query("SELECT p.flag \n" +
             "FROM Permission p \n" +
             "JOIN RolePermission rp ON rp.permissionId = p.id \n" +

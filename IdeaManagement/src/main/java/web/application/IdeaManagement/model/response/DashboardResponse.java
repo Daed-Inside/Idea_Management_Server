@@ -12,7 +12,7 @@ public class DashboardResponse {
     private Long anonymousComment;
     private FirstBarChartResponse firstBarChart;
     private PieChartResponse pieChart;
-    private SecondBarChartResponse secondBarChar;
+    private SecondBarChartResponse secondBarChart;
 
     public DashboardResponse(Long totalIdea, Long anonymousIdea) {
         this.totalIdea = totalIdea;

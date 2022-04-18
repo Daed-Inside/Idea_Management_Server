@@ -100,8 +100,8 @@ public class AuthenController {
             User user = modelMapper.map(signUpRequest, User.class);
 
 //            Set<Long> strRoles = signUpRequest.getRole();
-//            String randomPass = RandomStringUtils.random(10, true, true);
-            String randomPass = "1234";
+            String randomPass = RandomStringUtils.random(10, true, true);
+//            String randomPass = "1234";
             Long roleId = signUpRequest.getRoleId();
             Set<Role> roles = systemManager.getSignUpRole(roleId);
             String generatedString = RandomStringUtils.random(10, true, true);

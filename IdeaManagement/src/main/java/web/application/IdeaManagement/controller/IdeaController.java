@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import web.application.IdeaManagement.dto.PageDto;
+import web.application.IdeaManagement.entity.Idea;
 import web.application.IdeaManagement.entity.IdeaComment;
 import web.application.IdeaManagement.entity.User;
 import web.application.IdeaManagement.manager.*;
@@ -55,16 +56,16 @@ public class IdeaController {
             if (Objects.equals(result, -2l)) {
                 return responseUtils.getResponseEntity(null, -2, "The topic is closed", HttpStatus.OK);
             } else {
-//                List<User> QAMag = userManager.getQAManager(ideaRequest.getDepartmentId());
-//                if (QAMag != null) {
-//                    for (User qa : QAMag) {
-//                        MailRequest mailReq = new MailRequest();
-//                        mailReq.setContent("Your topic have a new idea, \n Click on this link to watch this: " + CLIENT_CONTEXTPATH + "/idea-detail/" + result);
-//                        mailReq.setReceiver(qa.getEmail());
-//                        mailReq.setSubject("New Idea for topic");
-//                        mailManager.sendMail(mailReq);
-//                    }
-//                }
+                List<User> QAMag = userManager.getQAManager(ideaRequest.getDepartmentId());
+                if (QAMag != null) {
+                    for (User qa : QAMag) {
+                        MailRequest mailReq = new MailRequest();
+                        mailReq.setContent("Your topic have a new idea, \n Click on this link to watch this: " + CLIENT_CONTEXTPATH + "/idea-detail/" + result);
+                        mailReq.setReceiver(qa.getEmail());
+                        mailReq.setSubject("New Idea for topic");
+                        mailManager.sendMail(mailReq);
+                    }
+                }
                 return responseUtils.getResponseEntity(result, 1, "Create Successfully", HttpStatus.OK);
             }
         } catch (Exception e) {
@@ -166,6 +167,12 @@ public class IdeaController {
             } else if (result.getId() != null && result.getId() == -2) {
                 return responseUtils.getResponseEntity(null, -2, "The topic is closed", HttpStatus.OK);
             } else {
+                Idea idea = ideaManager.getIdeaById(commentRequest.getIdeaId());
+                MailRequest mailReq = new MailRequest();
+                mailReq.setContent("Your Idea have a new comment, \n Click on this link to watch this: " + CLIENT_CONTEXTPATH + "/idea-detail/" + commentRequest.getIdeaId());
+                mailReq.setReceiver(idea.getCreatedUser());
+                mailReq.setSubject("New Idea for topic");
+                mailManager.sendMail(mailReq);
                 return responseUtils.getResponseEntity(result, 1, "Create Successfully", HttpStatus.OK);
             }
         } catch (Exception e) {

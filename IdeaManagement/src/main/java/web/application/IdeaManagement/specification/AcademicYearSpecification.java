@@ -15,6 +15,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -27,6 +28,7 @@ public class AcademicYearSpecification {
     public Specification<AcademicYear> filterAcademicYear(String searchKey) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
+            predicates.add(cb.greaterThan(root.get("endDate"), new Date()));
             if (!StringUtils.isEmpty(searchKey)) {
                 try {
                     Long parseId = Long.parseLong(searchKey);

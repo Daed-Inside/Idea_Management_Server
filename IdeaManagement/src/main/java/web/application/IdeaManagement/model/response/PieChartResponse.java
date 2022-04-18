@@ -11,5 +11,5 @@ import java.util.List;
 @AllArgsConstructor
 public class PieChartResponse {
     List<String> listDept;
-    List<Double> listvalue;
+    List<Double> listValue;
 }

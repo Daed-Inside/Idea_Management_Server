@@ -54,6 +54,10 @@ public class IdeaManager {
     @Autowired
     IdeaSpecification ideaSpecification;
 
+    public Idea getIdeaById(Long id) {
+        return ideaRepository.findById(id).get();
+    }
+
     public Long createIdea(IdeaRequest ideaRequest, String username, String userId) {
         try {
 //            Topic topic = topicRepository.findById(topicId).get();
@@ -251,7 +255,7 @@ public class IdeaManager {
 
     public List<ExcelExportResponse> getExportData(String year, String semester, Long department, Long topic) {
         try {
-            return ideaRepository.getExcelData(year, semester, department, topic);
+            return ideaRepository.getExcelData(year, semester, department, topic, new Date());
         } catch (Exception e) {
             return new ArrayList<>();
         }
@@ -290,7 +294,7 @@ public class IdeaManager {
             //--------------------Second bar chart------------------//
             List<String> listDept2 = new ArrayList<>();
             List<Long> listUser = new ArrayList<>();
-            List<Object[]> bar2 = userRepository.countUserByDept();
+            List<Object[]> bar2 = userRepository.countUserByDept(department);
             for (Object[] obj : bar2) {
                 listDept2.add(obj[0].toString());
                 listUser.add(Long.parseLong(obj[1].toString()));
@@ -298,7 +302,7 @@ public class IdeaManager {
             SecondBarChartResponse newBar2 = new SecondBarChartResponse(listDept2, listUser);
             response.setFirstBarChart(newbar1);
             response.setPieChart(newPie);
-            response.setSecondBarChar(newBar2);
+            response.setSecondBarChart(newBar2);
             return response;
         } catch (Exception e) {
             e.printStackTrace();
